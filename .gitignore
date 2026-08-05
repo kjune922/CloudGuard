@@ -35,3 +35,19 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Environment ###
+.env
+.env.*
+application-local.properties
+application-prod.properties
+
+### IntelliJ ###
+.idea/
+*.iml
+
+### Gradle ###
+.gradle/
+build/
+
+# 절대금지 - AWS관련
