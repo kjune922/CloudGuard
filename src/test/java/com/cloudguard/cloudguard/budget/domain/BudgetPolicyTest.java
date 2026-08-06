@@ -1,4 +1,4 @@
-package com.cloudguard.cloudguard.budget;
+package com.cloudguard.cloudguard.budget.domain;
 
 
 import org.junit.jupiter.api.Test;
