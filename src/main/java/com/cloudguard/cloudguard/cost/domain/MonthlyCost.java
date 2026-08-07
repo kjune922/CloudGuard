@@ -21,7 +21,19 @@ public class MonthlyCost {
             throw new IllegalArgumentException("조회할 연월은 필수입니다.");
         }
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO; // 총합total은 0부터 시작
+
+        /** <cost.compareTo(BigDecimal.ZERO)>
+         * 음수 -> cost < 0
+         * 0 -> cost = 0
+         * 양수 -> cost > 0
+         */
+
+        /** <YearMonth> 연도 & 월만 표기하는 클래스
+         * LocalDate.of(2026,9,22) -> 2026년 9월 22일
+         * YearMonth.of(2026,8) -> 2026년 8월
+         * YearMonth.from() 은 다른 날짜 객체에서 "연도와 월" 만 뽑아내는 메서드
+         */
 
         for(CostRecord record : costRecords){
             if(YearMonth.from(record.getUsageDate()).equals(yearMonth)){
