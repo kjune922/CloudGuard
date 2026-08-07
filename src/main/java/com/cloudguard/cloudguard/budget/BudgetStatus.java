@@ -1,4 +1,4 @@
-package com.cloudguard.cloudguard.budget.domain;
+package com.cloudguard.cloudguard.budget;
 
 
 /** 예산 상태 체크 = BudgetStatus

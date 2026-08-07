@@ -1,5 +1,7 @@
 package com.cloudguard.cloudguard.budget.domain;
 
+import com.cloudguard.cloudguard.budget.BudgetStatus;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
