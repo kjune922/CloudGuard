@@ -52,3 +52,19 @@ CloudGuard는 AWS 비용과 CloudWatch 경보 정보를 수집하여
 - [ ] 장애 관리 기능
 - [ ] 테스트 코드 작성
 - [ ] AWS 배포
+
+
+# 진행 과정
+
+## 2026-08-08
+
+CostRecord를 순수 Java 객체에서 JPA가 관리하는 엔티티로 바꿈
+
+@Entity는 JPA에게 "이 클래스는 DB 테이블과 연결해서 관리할 객체" 라는 뜻
+
+@Entity가 없으면 JPA는 CostRecord를 저장 대상이라 인식X
+
+@Id
+-> DB테이블의 기본키(Primary Key)를 의미
+
+@GeneratedValue는 id를 우리가 직접 넣지 않고 DB가 자동으로 만들어주게 하는 것

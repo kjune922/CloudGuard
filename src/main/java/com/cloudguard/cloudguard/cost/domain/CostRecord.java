@@ -1,15 +1,26 @@
 package com.cloudguard.cloudguard.cost.domain;
 
 import com.cloudguard.cloudguard.cost.CloudService;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Entity
 public class CostRecord {
 
-    private final CloudService service; // 사용한 서비스
-    private final BigDecimal cost; // 비용
-    private final LocalDate usageDate; // 비용발생일
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private CloudService service; // 사용한 서비스
+    private BigDecimal cost; // 비용
+    private LocalDate usageDate; // 비용발생일
+
+    protected CostRecord() {
+
+    }
 
 
     public CostRecord(CloudService service, BigDecimal cost, LocalDate usageDate) {
@@ -19,6 +30,10 @@ public class CostRecord {
         this.service = service;
         this.cost = cost;
         this.usageDate = usageDate;
+    }
+
+    public Long getId(){
+        return id;
     }
 
     private void validateService(CloudService service) {

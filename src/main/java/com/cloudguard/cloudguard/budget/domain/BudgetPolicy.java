@@ -40,13 +40,13 @@ public class BudgetPolicy {
     }
 
     private void validateMonthlyLimit(BigDecimal monthlyLimit) {
-        if (monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) <= 0){
+        if (monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) < 0){
             throw new IllegalArgumentException("월 예산은 0보다 커야 합니다 !!");
         }
     }
 
     private void validateCurrentCost(BigDecimal currentCost) {
-        if(currentCost == null || currentCost.compareTo(BigDecimal.ZERO) <= 0){
+        if(currentCost == null || currentCost.compareTo(BigDecimal.ZERO) < 0){
             throw new IllegalArgumentException("현재 비용은 0 이상이어야 합니다 !!");
         }
     }
