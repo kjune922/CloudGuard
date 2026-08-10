@@ -1,4 +1,4 @@
-package com.cloudguard.cloudguard.cost;
+package com.cloudguard.cloudguard.cost.domain;
 
 public enum CloudService {
     EC2,

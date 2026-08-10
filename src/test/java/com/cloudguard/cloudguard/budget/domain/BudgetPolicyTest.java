@@ -1,7 +1,6 @@
 package com.cloudguard.cloudguard.budget.domain;
 
 
-import com.cloudguard.cloudguard.budget.BudgetStatus;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -1,6 +1,5 @@
 package com.cloudguard.cloudguard.cost.domain;
 
-import com.cloudguard.cloudguard.cost.CloudService;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -32,10 +31,6 @@ public class CostRecord {
         this.usageDate = usageDate;
     }
 
-    public Long getId(){
-        return id;
-    }
-
     private void validateService(CloudService service) {
 
         if(service == null){
@@ -58,6 +53,10 @@ public class CostRecord {
         if(usageDate == null){
             throw new IllegalArgumentException("비용 발생일은 필수입니다.");
         }
+    }
+
+    public Long getId(){
+        return id;
     }
 
     public CloudService getService() {

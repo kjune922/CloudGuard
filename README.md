@@ -68,3 +68,25 @@ CostRecord를 순수 Java 객체에서 JPA가 관리하는 엔티티로 바꿈
 -> DB테이블의 기본키(Primary Key)를 의미
 
 @GeneratedValue는 id를 우리가 직접 넣지 않고 DB가 자동으로 만들어주게 하는 것
+
+## 2026-08-10
+
+- CostRecordRepository는 CostRecord를 DB에 저장하고 다시 꺼내오기위해 만듬
+- @Entity만 붙였다고 자동으로 우리가 원하는 데이터를 저장해주는건 아님
+
+### 작동원리
+
+내가 짠 자바 코드 -> CostRecordRepository -> JPA -> MySQL
+
+### 현재 클래스들의 역할
+
+CostRecord
+→ 비용 기록이 무엇인지 표현
+
+MonthlyCost
+→ 비용을 어떻게 계산할지 표현
+
+CostRecordRepository
+→ 비용 기록을 어디에 저장하고 어떻게 가져올지 담당 == CostRecord를 프로그램이 꺼져도 사라지지 않도록 DB에 저장하고
+필요할 때 DB에서 다시 조회하기 위함.
+
