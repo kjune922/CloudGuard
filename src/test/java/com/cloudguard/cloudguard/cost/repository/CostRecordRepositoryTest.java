@@ -8,6 +8,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,7 +26,7 @@ class CostRecordRepositoryTest {
                 LocalDate.of(2026,8,10)
         );
 
-        CostRecord saveRecord = costRecordRepository.save(costRecord);
+        costRecordRepository.save(costRecord);
 
         CostRecord findRecord = costRecordRepository.findById(costRecord.getId()).orElseThrow();
 
@@ -33,5 +34,44 @@ class CostRecordRepositoryTest {
         assertThat(findRecord.getCost()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(findRecord.getUsageDate()).isEqualTo(LocalDate.of(2026,8,10));
     }
+
+    @Test
+    void 특정_월의_비용을_가져오자() {
+
+        CostRecord costRecord1 = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(200),
+                LocalDate.of(2026,8,1)
+        );
+
+        CostRecord costRecord2 = new CostRecord(
+                CloudService.S3,
+                BigDecimal.valueOf(100),
+                LocalDate.of(2026,8,31)
+        );
+
+        CostRecord costRecord3 = new CostRecord(
+                CloudService.RDS,
+                BigDecimal.valueOf(300),
+                LocalDate.of(2026,7,5)
+        );
+
+        costRecordRepository.save(costRecord1);
+        costRecordRepository.save(costRecord2);
+        costRecordRepository.save(costRecord3);
+
+        LocalDate startDate = LocalDate.of(2026,8,1);
+        LocalDate endDate = LocalDate.of(2026,8,31);
+
+        List<CostRecord> records = costRecordRepository.findByUsageDateBetween(startDate,endDate);
+
+        assertThat(records.size()).isEqualTo(2);
+
+        assertThat(records).extracting(CostRecord::getService).containsExactlyInAnyOrder(
+                CloudService.EC2,
+                CloudService.S3
+        );
+    }
+
 
 }

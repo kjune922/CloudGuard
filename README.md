@@ -90,3 +90,27 @@ CostRecordRepository
 → 비용 기록을 어디에 저장하고 어떻게 가져올지 담당 == CostRecord를 프로그램이 꺼져도 사라지지 않도록 DB에 저장하고
 필요할 때 DB에서 다시 조회하기 위함.
 
+
+### CostService 생성
+
+YearMonth 입력
+↓
+해당 월 시작일 / 마지막일 계산
+↓
+Repository에서 해당 기간 CostRecord 조회
+↓
+MonthlyCost 생성
+↓
+도메인 로직으로 총 비용 계산
+↓
+BigDecimal 반환
+
+### CostService Test 진행 중 에러
+
+초기에
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+를 켜서 DB없어도 Test를 진행하기위해 설정해놓을걸 까먹고 안지웠다가
+Test진행중 Spring Boot와 DB 연결을 자동으로 구성하는걸 막아
+CostRecordRepository Bean을 만들수 없는 에러 발생
+
+지우고 다시 실행 -> 성공
