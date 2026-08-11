@@ -1,7 +1,6 @@
-package com.cloudguard.cloudguard.budget.dto;
+package com.cloudguard.cloudguard.cost.dto;
 
 import com.cloudguard.cloudguard.cost.domain.CloudService;
-import com.cloudguard.cloudguard.cost.service.CostService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

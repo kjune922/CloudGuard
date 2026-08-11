@@ -2,10 +2,7 @@ package com.cloudguard.cloudguard.budget.controller;
 
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
-import com.cloudguard.cloudguard.budget.dto.CostCreateRequest;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
-import com.cloudguard.cloudguard.cost.domain.CostRecord;
-import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +31,5 @@ public class BudgetController {
             BigDecimal monthlyLimit
     ){
             return budgetService.determineMonthlyStatus(yearMonth,monthlyLimit);
-    }
-
-    @PostMapping("/add-cost")
-    public CostRecord addServiceCost(@RequestBody CostCreateRequest request){
-        return costService.addServiceCost(
-                request.getCloudService(),
-                request.getCost(),
-                request.getUsageDate()
-        );
     }
 }
