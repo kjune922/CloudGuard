@@ -114,3 +114,19 @@ Test진행중 Spring Boot와 DB 연결을 자동으로 구성하는걸 막아
 CostRecordRepository Bean을 만들수 없는 에러 발생
 
 지우고 다시 실행 -> 성공
+
+## 2026-08-11
+
+* `CostController`와 `CostCreateRequest` DTO 구현
+* `POST /api/costs/add-cost` 비용 등록 API 구현
+*  Postman으로 비용 저장 및 예산 상태 조회 흐름 검증
+
+    * 비용 `800`, 월 예산 `1000` → `CAUTION` 반환 확인
+* `CostControllerTest` 작성 및 통과
+
+    * `MockMvc`로 POST 요청 검증
+    * `@MockitoBean`으로 `CostService` 모킹
+    * `given().willReturn()`으로 가짜 반환값 설정
+    * HTTP 상태 코드와 응답 JSON 검증
+* `CostServiceTest`에 `@Transactional`을 적용해 테스트 데이터 롤백 처리
+
