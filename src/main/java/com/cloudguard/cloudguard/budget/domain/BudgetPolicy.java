@@ -38,7 +38,7 @@ public class BudgetPolicy {
     }
 
     private void validateMonthlyLimit(BigDecimal monthlyLimit) {
-        if (monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) < 0){
+        if (monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("월 예산은 0보다 커야 합니다 !!");
         }
     }
