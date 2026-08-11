@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/budgets")
+@RequestMapping("/api/costs")
 public class CostController {
 
     private final CostService costService;
