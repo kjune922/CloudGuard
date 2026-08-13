@@ -2,7 +2,6 @@ package com.cloudguard.cloudguard.budget.domain;
 
 import com.cloudguard.cloudguard.budget.converter.YearMonthConverter;
 import jakarta.persistence.*;
-import org.hibernate.type.YesNoConverter;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;

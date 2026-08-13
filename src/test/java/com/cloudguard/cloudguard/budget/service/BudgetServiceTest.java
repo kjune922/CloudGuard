@@ -1,6 +1,8 @@
 package com.cloudguard.cloudguard.budget.service;
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
+import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -20,11 +23,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BudgetServiceTest {
 
     private final CostRecordRepository costRecordRepository;
+    private final MonthlyBudgetRepository monthlyBudgetRepository;
     private final BudgetService budgetService;
 
     @Autowired
-    BudgetServiceTest(CostRecordRepository costRecordRepository, BudgetService budgetService) {
+    BudgetServiceTest(CostRecordRepository costRecordRepository, MonthlyBudgetRepository monthlyBudgetRepository, BudgetService budgetService) {
         this.costRecordRepository = costRecordRepository;
+        this.monthlyBudgetRepository = monthlyBudgetRepository;
         this.budgetService = budgetService;
     }
 
@@ -60,7 +65,25 @@ class BudgetServiceTest {
 
         assertEquals(BudgetStatus.CAUTION,result);
 
+    }
 
+    @Test
+    void 월_예산을_저장 () {
+
+        YearMonth yearMonth = YearMonth.of(2026,8);
+        BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
+
+        MonthlyBudget savedBudget = budgetService.addMonthlyBudget(yearMonth,monthlyLimit);
+
+        MonthlyBudget foundBudget = monthlyBudgetRepository
+                .findByYearMonth(yearMonth)
+                .orElseThrow();
+
+        assertThat(savedBudget.getId()).isNotNull();
+        assertThat(foundBudget.getYearMonth())
+                .isEqualTo(yearMonth);
+        assertThat(foundBudget.getMonthlyLimit())
+                .isEqualByComparingTo(monthlyLimit);
 
     }
 
