@@ -15,11 +15,9 @@ import java.time.YearMonth;
 public class BudgetController {
 
     private final BudgetService budgetService;
-    private final CostService costService;
 
-    public BudgetController(BudgetService budgetService, CostService costService) {
+    public BudgetController(BudgetService budgetService) {
         this.budgetService = budgetService;
-        this.costService = costService;
     }
 
     @GetMapping("/status")

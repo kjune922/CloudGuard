@@ -33,7 +33,7 @@ CloudGuard는 AWS 비용과 CloudWatch 경보 정보를 수집하여
 
 ## 기술 스택
 
-- Java 21
+- Java 17
 - Spring Boot
 - Spring MVC
 - Spring Data JPA
@@ -129,4 +129,6 @@ CostRecordRepository Bean을 만들수 없는 에러 발생
     * `given().willReturn()`으로 가짜 반환값 설정
     * HTTP 상태 코드와 응답 JSON 검증
 * `CostServiceTest`에 `@Transactional`을 적용해 테스트 데이터 롤백 처리
+
+## 2026-08-13
 
