@@ -1,19 +1,40 @@
 package com.cloudguard.cloudguard.budget.domain;
 
+import jakarta.persistence.*;
+import org.hibernate.type.YesNoConverter;
+
 import java.math.BigDecimal;
 import java.time.YearMonth;
 
+
+@Entity
+@Table(name = "monthly_budgets")
 public class MonthlyBudget {
 
-    private final YearMonth yearMonth;
-    private final BigDecimal monthlyLimit;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+
+    @Convert(converter = YesNoConverter.class)
+    @Column(name = "year_month",nullable = false,unique = true,length = 7)
+    private YearMonth yearMonth;
+
+    @Column(name = "monthly_limit",nullable = false)
+    private BigDecimal monthlyLimit;
+
+    protected MonthlyBudget() {
+    }
 
     public MonthlyBudget(YearMonth yearMonth, BigDecimal monthlyLimit) {
         validateYearMonth(yearMonth);
         validateMonthlyLimit(monthlyLimit);
         this.yearMonth = yearMonth;
         this.monthlyLimit = monthlyLimit;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public BigDecimal getMonthlyLimit() {

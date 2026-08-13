@@ -1,14 +1,9 @@
 package com.cloudguard.cloudguard.budget.domain;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
-import java.time.Year;
 import java.time.YearMonth;
-
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MonthlyBudgetTest {
 
