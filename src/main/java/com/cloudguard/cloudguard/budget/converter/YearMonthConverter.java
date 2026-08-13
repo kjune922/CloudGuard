@@ -2,11 +2,11 @@ package com.cloudguard.cloudguard.budget.converter;
 
 
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Convert;
+import jakarta.persistence.Converter;
 
 import java.time.YearMonth;
 
-@Convert
+@Converter
 public class YearMonthConverter implements AttributeConverter<YearMonth,String> {
 
 

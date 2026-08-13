@@ -1,5 +1,6 @@
 package com.cloudguard.cloudguard.budget.domain;
 
+import com.cloudguard.cloudguard.budget.converter.YearMonthConverter;
 import jakarta.persistence.*;
 import org.hibernate.type.YesNoConverter;
 
@@ -16,7 +17,7 @@ public class MonthlyBudget {
     private Long id;
 
 
-    @Convert(converter = YesNoConverter.class)
+    @Convert(converter = YearMonthConverter.class)
     @Column(name = "year_month",nullable = false,unique = true,length = 7)
     private YearMonth yearMonth;
 
