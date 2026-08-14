@@ -62,7 +62,7 @@ class BudgetControllerTest {
                 .content("""
                         {
                             "yearMonth": "2026-08",
-                            "monthlyLimit": "1000"
+                            "monthlyLimit": 1000
                         }
                         """))
                 .andExpect(status().isOk())
