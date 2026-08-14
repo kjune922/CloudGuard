@@ -3,6 +3,7 @@ package com.cloudguard.cloudguard.budget.service;
 import com.cloudguard.cloudguard.budget.domain.BudgetPolicy;
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,10 @@ public class BudgetService {
     }
 
     public MonthlyBudget addMonthlyBudget(YearMonth yearMonth,BigDecimal monthlyLimit){
+        if(monthlyBudgetRepository.existsByYearMonth(yearMonth)){
+            throw new DuplicateMonthlyBudgetException();
+        }
+
         MonthlyBudget monthlyBudget = new MonthlyBudget(yearMonth,monthlyLimit);
 
         return monthlyBudgetRepository.save(monthlyBudget);

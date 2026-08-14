@@ -21,4 +21,7 @@ public interface MonthlyBudgetRepository extends JpaRepository<MonthlyBudget, Lo
     // Spring Data Jpa가 메서드 이름 분석 후
     // SELECT * FROM monthly_budgets WHERE yearMonth = ? 라는 쿼리를 만듬
     // Optional의 사용이유 : 요청한 달의 예산이 아직 등록 안되었을 때 대비
+
+    // Spring Data JPA가 메서드 이름을 분석해 해당 연월의 데이터가 존재하는지 조회해줌
+    boolean existsByYearMonth(YearMonth yearMonth);
 }
