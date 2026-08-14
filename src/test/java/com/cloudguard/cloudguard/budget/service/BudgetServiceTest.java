@@ -61,7 +61,7 @@ class BudgetServiceTest {
         YearMonth yearMonth = YearMonth.of(2026,8);
         BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
 
-        BudgetStatus result = budgetService.determineMonthlyStatus(yearMonth,monthlyLimit);
+        BudgetStatus result = budgetService.determineMonthlyStatus(yearMonth);
 
         assertEquals(BudgetStatus.CAUTION,result);
 

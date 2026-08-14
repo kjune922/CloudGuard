@@ -36,8 +36,7 @@ class BudgetControllerTest {
         BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
 
         given(budgetService.determineMonthlyStatus(
-                yearMonth,
-                monthlyLimit
+                yearMonth
         )).willReturn(BudgetStatus.CAUTION);
 
         mockMvc.perform(get("/api/budgets/status")
@@ -46,8 +45,7 @@ class BudgetControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("\"CAUTION\""));
         verify(budgetService).determineMonthlyStatus(
-                yearMonth,
-                monthlyLimit
+                yearMonth
         );
     }
 

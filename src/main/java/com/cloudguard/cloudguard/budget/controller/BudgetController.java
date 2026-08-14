@@ -25,11 +25,9 @@ public class BudgetController {
     public BudgetStatus determineMonthlyStatus(
             @RequestParam("yearMonth")
             @DateTimeFormat (pattern = "yyyy-MM")
-            YearMonth yearMonth,
-            @RequestParam("monthlyLimit")
-            BigDecimal monthlyLimit
+            YearMonth yearMonth
     ){
-            return budgetService.determineMonthlyStatus(yearMonth,monthlyLimit);
+            return budgetService.determineMonthlyStatus(yearMonth);
     }
 
     @PostMapping("/add")
