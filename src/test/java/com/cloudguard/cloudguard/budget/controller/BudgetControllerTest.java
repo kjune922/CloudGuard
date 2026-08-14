@@ -33,15 +33,13 @@ class BudgetControllerTest {
     @Test
     void 월_예산_상태_조회() throws Exception {
         YearMonth yearMonth = YearMonth.of(2026,8);
-        BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
 
         given(budgetService.determineMonthlyStatus(
                 yearMonth
         )).willReturn(BudgetStatus.CAUTION);
 
         mockMvc.perform(get("/api/budgets/status")
-                .param("yearMonth","2026-08")
-                .param("monthlyLimit","1000"))
+                .param("yearMonth","2026-08"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("\"CAUTION\""));
         verify(budgetService).determineMonthlyStatus(
@@ -64,7 +62,7 @@ class BudgetControllerTest {
                 .content("""
                         {
                             "yearMonth": "2026-08",
-                            "monthlyLimit": 1000
+                            "monthlyLimit": "1000"
                         }
                         """))
                 .andExpect(status().isOk())
