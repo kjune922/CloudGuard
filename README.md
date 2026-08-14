@@ -139,3 +139,9 @@ POSTMAN 활용해서 request보내고 잘 보내졌는지 확인
 ![img_1.png](img_1.png)
 
 POSTMAN 활용해서 DB 중복 데이터에 대해 에러발생하는지 확인
+
+## 2026-08-14
+
+![img_2.png](img_2.png)
+
+반환 에러메시지 500 -> 409 conflict로 변경
