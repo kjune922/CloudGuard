@@ -2,10 +2,13 @@ package com.cloudguard.cloudguard.budget.service;
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
+import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +19,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -88,5 +92,30 @@ class BudgetServiceTest {
                 .isEqualByComparingTo(monthlyLimit);
 
     }
+
+    @Test
+    void 등록되지_않은_연월의_예산상태를_조회하면_예외발생() {
+        YearMonth yearMonth = YearMonth.of(2050,10);
+
+        Assertions.assertThatThrownBy(() ->
+                        budgetService.determineMonthlyStatus(yearMonth))
+                .isInstanceOf(MonthlyBudgetNotFoundException.class)
+                .hasMessage("해당 연월의 예산이 등록되어 있지 않습니다.");
+    }
+
+    @Test
+    void 월예산_중복등록_예외발생() {
+        YearMonth yearMonth = YearMonth.of(2026,8);
+        BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
+
+        monthlyBudgetRepository.save( new MonthlyBudget(yearMonth,monthlyLimit));
+
+        assertThatThrownBy(() ->
+                budgetService.addMonthlyBudget(yearMonth,monthlyLimit))
+                .isInstanceOf(DuplicateMonthlyBudgetException.class)
+                .hasMessage("해당 연월의 예산이 이미 등록되어 있습니다.");
+
+    }
+
 
 }
