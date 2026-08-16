@@ -56,4 +56,10 @@ public class MonthlyBudget {
             throw new IllegalArgumentException("월 예산은 0보다 커야합니다.");
         }
     }
+
+    // 월예산 변경 메소드
+    public void updateMonthlyLimit(BigDecimal monthlyLimit){
+        validateMonthlyLimit(monthlyLimit);
+        this.monthlyLimit = monthlyLimit;
+    }
 }

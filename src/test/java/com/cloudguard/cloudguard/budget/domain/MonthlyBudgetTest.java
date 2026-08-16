@@ -52,4 +52,29 @@ class MonthlyBudgetTest {
                 .hasMessage("월 예산은 0보다 커야합니다.");
     }
 
+    @Test
+    void 월_예산한도_변경 () {
+        MonthlyBudget monthlyBudget = new MonthlyBudget(
+                YearMonth.of(2026,10),
+                BigDecimal.valueOf(2000)
+        );
+
+        monthlyBudget.updateMonthlyLimit(BigDecimal.valueOf(3000));
+
+        assertThat(monthlyBudget.getMonthlyLimit()).isEqualByComparingTo(BigDecimal.valueOf(3000));
+    }
+
+    @Test
+    void 월예산_0으로_변경불가 () {
+        MonthlyBudget monthlyBudget = new MonthlyBudget(
+                YearMonth.of(2026,10),
+                BigDecimal.valueOf(2000)
+        );
+
+        assertThatThrownBy(() ->
+                monthlyBudget.updateMonthlyLimit(BigDecimal.valueOf(0)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("월 예산은 0보다 커야합니다.");
+    }
+
 }
