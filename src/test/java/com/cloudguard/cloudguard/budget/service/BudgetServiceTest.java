@@ -8,12 +8,14 @@ import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.parser.Entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -29,12 +31,14 @@ class BudgetServiceTest {
     private final CostRecordRepository costRecordRepository;
     private final MonthlyBudgetRepository monthlyBudgetRepository;
     private final BudgetService budgetService;
+    private final EntityManager entityManager; // 실제 DB반영 테스트용
 
     @Autowired
-    BudgetServiceTest(CostRecordRepository costRecordRepository, MonthlyBudgetRepository monthlyBudgetRepository, BudgetService budgetService) {
+    BudgetServiceTest(CostRecordRepository costRecordRepository, MonthlyBudgetRepository monthlyBudgetRepository, BudgetService budgetService, EntityManager entityManager) {
         this.costRecordRepository = costRecordRepository;
         this.monthlyBudgetRepository = monthlyBudgetRepository;
         this.budgetService = budgetService;
+        this.entityManager = entityManager;
     }
 
     @Test
@@ -115,6 +119,23 @@ class BudgetServiceTest {
                 .isInstanceOf(DuplicateMonthlyBudgetException.class)
                 .hasMessage("해당 연월의 예산이 이미 등록되어 있습니다.");
 
+    }
+
+    @Test
+    void 월_예산_변경 () {
+        YearMonth yearMonth = YearMonth.of(2026,10);
+        monthlyBudgetRepository.save(new MonthlyBudget(yearMonth,BigDecimal.valueOf(1000)));
+
+        budgetService.updateMonthlyBudget(yearMonth,BigDecimal.valueOf(2000));
+
+        entityManager.flush(); // flush(): 변경 내용을 실제 DB에 반영
+        entityManager.clear(); // clear(): 메모리에 관리 중인 엔티티 제거
+
+        MonthlyBudget updatedBudget = monthlyBudgetRepository
+                .findByYearMonth(yearMonth)
+                .orElseThrow();
+
+        assertThat(updatedBudget.getMonthlyLimit()).isEqualByComparingTo(BigDecimal.valueOf(2000));
     }
 
 

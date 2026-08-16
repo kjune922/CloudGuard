@@ -7,6 +7,7 @@ import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetExceptio
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.service.CostService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,5 +46,16 @@ public class BudgetService {
         MonthlyBudget monthlyBudget = new MonthlyBudget(yearMonth,monthlyLimit);
 
         return monthlyBudgetRepository.save(monthlyBudget);
+    }
+
+    @Transactional
+    public MonthlyBudget updateMonthlyBudget(YearMonth yearMonth,BigDecimal monthlyLimit) {
+        MonthlyBudget monthlyBudget = monthlyBudgetRepository
+                .findByYearMonth(yearMonth)
+                .orElseThrow(MonthlyBudgetNotFoundException::new);
+
+        monthlyBudget.updateMonthlyLimit(monthlyLimit);
+
+        return monthlyBudget;
     }
 }
