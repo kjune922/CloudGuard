@@ -129,7 +129,7 @@ class BudgetServiceTest {
         budgetService.updateMonthlyBudget(yearMonth,BigDecimal.valueOf(2000));
 
         entityManager.flush(); // flush(): 변경 내용을 실제 DB에 반영
-        entityManager.clear(); // clear(): 메모리에 관리 중인 엔티티 제거
+        entityManager.clear(); // clear(): 메모리에 관리 중인 엔티티 제거 >> 실제로DB에 반영이 되었는지 확인용
 
         MonthlyBudget updatedBudget = monthlyBudgetRepository
                 .findByYearMonth(yearMonth)

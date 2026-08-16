@@ -23,4 +23,5 @@ public class BudgetCreateRequest {
     public BigDecimal getMonthlyLimit() {
         return monthlyLimit;
     }
+
 }

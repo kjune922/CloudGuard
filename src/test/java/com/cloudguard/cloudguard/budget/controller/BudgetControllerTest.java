@@ -10,8 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -112,6 +111,37 @@ class BudgetControllerTest {
         verify(budgetService).addMonthlyBudget(
                 yearMonth1,
                 monthlyLimit
+        );
+    }
+
+    @Test
+    void 월_예산을_변경 () throws Exception{
+        YearMonth yearMonth = YearMonth.of(2026,8);
+        BigDecimal updateLimit = BigDecimal.valueOf(2000);
+
+        MonthlyBudget updatedBudget = new MonthlyBudget(yearMonth,updateLimit);
+
+        given(budgetService.updateMonthlyBudget(
+                yearMonth,
+                updateLimit
+        )).willReturn(updatedBudget);
+
+        mockMvc.perform(put("/api/budgets/2026-08")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                        "monthlyLimit": 2000
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.yearMonth")
+                        .value("2026-08"))
+                .andExpect(jsonPath("$.monthlyLimit")
+                        .value(2000));
+
+        verify(budgetService).updateMonthlyBudget(
+                yearMonth,
+                updateLimit
         );
     }
 
