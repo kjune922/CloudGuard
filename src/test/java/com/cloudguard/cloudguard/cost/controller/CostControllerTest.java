@@ -12,8 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,7 +64,24 @@ class CostControllerTest {
                 BigDecimal.valueOf(800),
                 LocalDate.of(2026,8,1)
         );
+    }
 
+    @Test
+    void 월_누적_비용_조회() throws Exception {
+        YearMonth yearMonth = YearMonth.of(2026,8);
+        BigDecimal totalCost = BigDecimal.valueOf(5000);
 
+        given(costService.calculateMonthlyCost(yearMonth))
+                .willReturn(totalCost);
+
+        mockMvc.perform(get("/api/costs/monthly")
+                .param("yearMonth","2026-08"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.yearMonth")
+                        .value("2026-08"))
+                .andExpect(jsonPath("$.totalCost")
+                        .value(5000));
+
+        verify(costService).calculateMonthlyCost(yearMonth);
     }
 }

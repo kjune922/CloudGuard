@@ -1,6 +1,5 @@
 package com.cloudguard.cloudguard.cost.controller;
 
-import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
 import com.cloudguard.cloudguard.cost.dto.CostCreateRequest;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.dto.MonthlyCostResponse;
@@ -33,7 +32,7 @@ public class CostController {
     @GetMapping("/monthly")
     public MonthlyCostResponse getMonthlyCost(
             @RequestParam("yearMonth")
-            @DateTimeFormat(pattern = "yyyy-MM")YearMonth yearMonth
+            @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth
             ) {
         BigDecimal totalCost = costService.calculateMonthlyCost(yearMonth);
 
