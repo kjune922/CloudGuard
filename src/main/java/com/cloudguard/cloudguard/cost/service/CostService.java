@@ -4,10 +4,8 @@ import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.domain.MonthlyCost;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
-import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -36,9 +34,7 @@ public class CostService {
                 startDate,
                 endDate
         );
-
         MonthlyCost monthlyCost = new MonthlyCost(records);
-
         return monthlyCost.calculateTotal(yearMonth);
     }
 

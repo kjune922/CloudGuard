@@ -1,5 +1,6 @@
 package com.cloudguard.cloudguard.cost.repository;
 
+import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,6 +10,12 @@ import java.util.List;
 public interface CostRecordRepository extends JpaRepository<CostRecord,Long> {
 
     List<CostRecord> findByUsageDateBetween(
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
+    List<CostRecord> findByServiceAndUsageDateBetween(
+            CloudService service,
             LocalDate startDate,
             LocalDate endDate
     );
