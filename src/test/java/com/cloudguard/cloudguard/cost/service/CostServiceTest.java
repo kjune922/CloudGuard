@@ -61,4 +61,44 @@ class CostServiceTest {
         Assertions.assertThat(totalCost)
                 .isEqualByComparingTo(BigDecimal.ZERO);
     }
+    @Test
+    void 특정_월의_특정_서비스_비용을_합산() {
+        CostRecord marchEc2First = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(3000),
+                LocalDate.of(2027, 3, 1)
+        );
+
+        CostRecord marchEc2Second = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(1000),
+                LocalDate.of(2027, 3, 31)
+        );
+
+        CostRecord marchRds = new CostRecord(
+                CloudService.RDS,
+                BigDecimal.valueOf(2000),
+                LocalDate.of(2027, 3, 15)
+        );
+
+        CostRecord aprilEc2 = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(9000),
+                LocalDate.of(2027, 4, 1)
+        );
+
+        costRecordRepository.save(marchEc2First);
+        costRecordRepository.save(marchEc2Second);
+        costRecordRepository.save(marchRds);
+        costRecordRepository.save(aprilEc2);
+
+        BigDecimal totalCost =
+                costService.calculateMonthlyCostByService(
+                        YearMonth.of(2027, 3),
+                        CloudService.EC2
+                );
+
+        Assertions.assertThat(totalCost)
+                .isEqualByComparingTo(BigDecimal.valueOf(4000));
+    }
 }
