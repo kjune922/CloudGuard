@@ -1,8 +1,10 @@
 package com.cloudguard.cloudguard.cost.controller;
 
+import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.dto.CostCreateRequest;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.dto.MonthlyCostResponse;
+import com.cloudguard.cloudguard.cost.dto.MonthlyServiceCostResponse;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +39,24 @@ public class CostController {
         BigDecimal totalCost = costService.calculateMonthlyCost(yearMonth);
 
         return new MonthlyCostResponse(yearMonth,totalCost);
+    }
+
+    @GetMapping("/monthly/by-service")
+    public MonthlyServiceCostResponse getMonthlyCostByService(
+            @RequestParam("yearMonth")
+            @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
+            @RequestParam("service") CloudService service
+    ) {
+        BigDecimal totalCost =
+                costService.calculateMonthlyCostByService(
+                        yearMonth,
+                        service
+                );
+
+        return new MonthlyServiceCostResponse(
+                yearMonth,
+                service,
+                totalCost
+        );
     }
 }
