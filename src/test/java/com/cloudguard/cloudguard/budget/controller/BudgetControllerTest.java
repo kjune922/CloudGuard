@@ -144,5 +144,26 @@ class BudgetControllerTest {
                 updateLimit
         );
     }
+    @Test
+    void 등록되지_않은_연월의_예산변경은_404() throws Exception {
+        YearMonth yearMonth = YearMonth.of(2050,10);
+        BigDecimal updateLimit = BigDecimal.valueOf(2000);
 
+        given(budgetService.updateMonthlyBudget(yearMonth,updateLimit))
+                .willThrow(new MonthlyBudgetNotFoundException());
+
+        mockMvc.perform(put("/api/budgets/2050-10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "monthlyLimit" : 2000
+                        }
+                        """))
+                .andExpect(status().isNotFound());
+
+        verify(budgetService).updateMonthlyBudget(
+                yearMonth,
+                updateLimit
+        );
+    }
 }
