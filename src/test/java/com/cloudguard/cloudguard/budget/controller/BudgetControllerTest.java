@@ -2,6 +2,7 @@ package com.cloudguard.cloudguard.budget.controller;
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,6 +165,28 @@ class BudgetControllerTest {
         verify(budgetService).updateMonthlyBudget(
                 yearMonth,
                 updateLimit
+        );
+    }
+    @Test
+    void 월_예산을_0이하로_변경하거나_설정하면_400() throws Exception{
+        YearMonth yearMonth = YearMonth.of(2026,8);
+        BigDecimal badUpdateLimit = BigDecimal.valueOf(0);
+
+        given(budgetService.updateMonthlyBudget(yearMonth,badUpdateLimit))
+                .willThrow(new WrongRequestBadRequestException());
+
+        mockMvc.perform(put("/api/budgets/2026-08")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "monthlyLimit" : 0
+                        }
+                        """))
+                .andExpect(status().isBadRequest());
+
+        verify(budgetService).updateMonthlyBudget(
+                yearMonth,
+                badUpdateLimit
         );
     }
 }
