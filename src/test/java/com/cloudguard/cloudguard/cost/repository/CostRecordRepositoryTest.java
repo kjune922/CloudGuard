@@ -72,6 +72,43 @@ class CostRecordRepositoryTest {
                 CloudService.S3
         );
     }
+    @Test
+    void 특정_월의_특정_서비스_비용만_조회() {
+        CostRecord augustEc2 = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(3000),
+                LocalDate.of(2027, 3, 1)
+        );
 
+        CostRecord augustRds = new CostRecord(
+                CloudService.RDS,
+                BigDecimal.valueOf(2000),
+                LocalDate.of(2027, 3, 15)
+        );
 
+        CostRecord aprilEc2 = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(9000),
+                LocalDate.of(2027, 4, 1)
+        );
+
+        costRecordRepository.save(augustEc2);
+        costRecordRepository.save(augustRds);
+        costRecordRepository.save(aprilEc2);
+
+        List<CostRecord> records =
+                costRecordRepository.findByServiceAndUsageDateBetween(
+                        CloudService.EC2,
+                        LocalDate.of(2027, 3, 1),
+                        LocalDate.of(2027, 3, 31)
+                );
+
+        assertThat(records).hasSize(1);
+        assertThat(records.get(0).getService())
+                .isEqualTo(CloudService.EC2);
+        assertThat(records.get(0).getCost())
+                .isEqualByComparingTo(BigDecimal.valueOf(3000));
+        assertThat(records.get(0).getUsageDate())
+                .isEqualTo(LocalDate.of(2027, 3, 1));
+    }
 }

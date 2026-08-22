@@ -13,11 +13,9 @@ public interface CostRecordRepository extends JpaRepository<CostRecord,Long> {
             LocalDate startDate,
             LocalDate endDate
     );
-
     List<CostRecord> findByServiceAndUsageDateBetween(
             CloudService service,
             LocalDate startDate,
             LocalDate endDate
     );
-
 }
