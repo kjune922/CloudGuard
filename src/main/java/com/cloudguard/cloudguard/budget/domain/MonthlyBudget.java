@@ -1,6 +1,7 @@
 package com.cloudguard.cloudguard.budget.domain;
 
 import com.cloudguard.cloudguard.budget.converter.YearMonthConverter;
+import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -53,7 +54,7 @@ public class MonthlyBudget {
 
     private void validateMonthlyLimit(BigDecimal monthlyLimit){
         if(monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) <= 0){
-            throw new IllegalArgumentException("월 예산은 0보다 커야합니다.");
+            throw new WrongRequestBadRequestException();
         }
     }
 

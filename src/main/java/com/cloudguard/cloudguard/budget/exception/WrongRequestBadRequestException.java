@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class WrongRequestBadRequestException extends RuntimeException {
 
     public WrongRequestBadRequestException() {
-        super("잘못된 수정 요청입니다");
+        super("월 예산은 0보다 커야 합니다.");
     }
 }
