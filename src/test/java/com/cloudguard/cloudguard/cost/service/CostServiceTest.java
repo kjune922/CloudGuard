@@ -51,4 +51,14 @@ class CostServiceTest {
         Assertions.assertThat(costService.calculateMonthlyCost(testDate))
                 .isEqualByComparingTo(BigDecimal.valueOf(600));
     }
+    @Test
+    void 비용기록이_없는_월의_총비용은_0() {
+        YearMonth yearMonth = YearMonth.of(2050, 10);
+
+        BigDecimal totalCost =
+                costService.calculateMonthlyCost(yearMonth);
+
+        Assertions.assertThat(totalCost)
+                .isEqualByComparingTo(BigDecimal.ZERO);
+    }
 }

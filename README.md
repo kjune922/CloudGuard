@@ -152,3 +152,4 @@ POSTMAN 활용해서 DB 중복 데이터에 대해 에러발생하는지 확인
 
 ![img_4.png](img_4.png)
 
+![img_5.png](img_5.png)
