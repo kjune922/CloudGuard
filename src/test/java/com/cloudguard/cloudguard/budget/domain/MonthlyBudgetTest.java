@@ -33,24 +33,24 @@ class MonthlyBudgetTest {
     void 월_예산은_null일수없음 () {
         assertThatThrownBy(() ->
                 new MonthlyBudget(YearMonth.of(2026,8),null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("월 예산은 0보다 커야합니다.");
+                .isInstanceOf(WrongRequestBadRequestException.class)
+                .hasMessage("월 예산은 0보다 커야 합니다.");
     }
 
     @Test
     void 월_예산은_0보다_커야함 () {
         assertThatThrownBy(() ->
                 new MonthlyBudget(YearMonth.of(2026,8),BigDecimal.ZERO))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("월 예산은 0보다 커야합니다.");
+                .isInstanceOf(WrongRequestBadRequestException.class)
+                .hasMessage("월 예산은 0보다 커야 합니다.");
     }
 
     @Test
     void 월_예산은_음수안됨 () {
         assertThatThrownBy(() ->
                 new MonthlyBudget(YearMonth.of(2026,8),BigDecimal.valueOf(-100)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("월 예산은 0보다 커야합니다.");
+                .isInstanceOf(WrongRequestBadRequestException.class)
+                .hasMessage("월 예산은 0보다 커야 합니다.");
     }
 
     @Test
