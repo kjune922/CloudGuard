@@ -38,6 +38,28 @@ public class CostService {
         return monthlyCost.calculateTotal(yearMonth);
     }
 
+    public BigDecimal calculateMonthlyCostByService(YearMonth yearMonth,CloudService service){
+
+        if(yearMonth == null){
+            throw new IllegalArgumentException("조회할 연월은 필수입니다.");
+        }
+
+        if (service == null) {
+            throw new IllegalArgumentException("조회할 서비스는 필수입니다.");
+        }
+
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        List<CostRecord> records = costRecordRepository.findByServiceAndUsageDateBetween(
+                service,
+                startDate,
+                endDate
+        );
+        MonthlyCost monthlyCost = new MonthlyCost(records);
+        return monthlyCost.calculateTotal(yearMonth);
+    }
+
     public CostRecord addServiceCost(CloudService cloudService, BigDecimal cost, LocalDate usageDate){
         CostRecord costRecord = new CostRecord(cloudService,cost,usageDate);
         return costRecordRepository.save(costRecord);

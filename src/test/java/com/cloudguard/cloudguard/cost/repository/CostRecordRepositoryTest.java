@@ -74,13 +74,13 @@ class CostRecordRepositoryTest {
     }
     @Test
     void 특정_월의_특정_서비스_비용만_조회() {
-        CostRecord augustEc2 = new CostRecord(
+        CostRecord marchEc2 = new CostRecord(
                 CloudService.EC2,
                 BigDecimal.valueOf(3000),
                 LocalDate.of(2027, 3, 1)
         );
 
-        CostRecord augustRds = new CostRecord(
+        CostRecord marchRds = new CostRecord(
                 CloudService.RDS,
                 BigDecimal.valueOf(2000),
                 LocalDate.of(2027, 3, 15)
@@ -92,8 +92,8 @@ class CostRecordRepositoryTest {
                 LocalDate.of(2027, 4, 1)
         );
 
-        costRecordRepository.save(augustEc2);
-        costRecordRepository.save(augustRds);
+        costRecordRepository.save(marchEc2);
+        costRecordRepository.save(marchRds);
         costRecordRepository.save(aprilEc2);
 
         List<CostRecord> records =
