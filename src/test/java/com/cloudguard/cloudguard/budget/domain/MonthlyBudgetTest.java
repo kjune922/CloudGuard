@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import static org.assertj.core.api.Assertions.*;
+import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 
 class MonthlyBudgetTest {
 
@@ -73,8 +74,8 @@ class MonthlyBudgetTest {
 
         assertThatThrownBy(() ->
                 monthlyBudget.updateMonthlyLimit(BigDecimal.valueOf(0)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("월 예산은 0보다 커야합니다.");
+                .isInstanceOf(WrongRequestBadRequestException.class)
+                .hasMessage("월 예산은 0보다 커야 합니다.");
     }
 
 }
