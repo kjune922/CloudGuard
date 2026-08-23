@@ -46,7 +46,7 @@ class CostControllerTest {
 
         mockMvc.perform(post("/api/costs/add-cost")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""    
+                .content("""
                         {
                             "cloudService" : "EC2",
                             "cost": 800,
@@ -103,7 +103,7 @@ class CostControllerTest {
                 .andExpect(jsonPath("$.service")
                         .value("EC2"))
                 .andExpect(jsonPath("$.totalCost")
-                        .value("4000"));
+                        .value(4000));
 
         verify(costService).calculateMonthlyCostByService(yearMonth,service);
 
