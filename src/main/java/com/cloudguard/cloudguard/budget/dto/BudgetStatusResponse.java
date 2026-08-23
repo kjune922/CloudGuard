@@ -14,11 +14,11 @@ public class BudgetStatusResponse {
     private final BudgetStatus status;
 
 
-    public BudgetStatusResponse(YearMonth yearMonth, BigDecimal monthlyLimit, BigDecimal totalCost, BigDecimal usageRage, BudgetStatus status) {
+    public BudgetStatusResponse(YearMonth yearMonth, BigDecimal monthlyLimit, BigDecimal totalCost, BigDecimal usageRate, BudgetStatus status) {
         this.yearMonth = yearMonth;
         this.monthlyLimit = monthlyLimit;
         this.totalCost = totalCost;
-        this.usageRate = usageRage;
+        this.usageRate = usageRate;
         this.status = status;
     }
 
