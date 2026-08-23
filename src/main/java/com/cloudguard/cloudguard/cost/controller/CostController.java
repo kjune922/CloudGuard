@@ -70,9 +70,8 @@ public class CostController {
         Map<CloudService, BigDecimal> serviceCosts =
                 costService.calculateMonthlyCostBreakdown(yearMonth);
 
-        // stream과 reduce에 대한 개념 필요
         BigDecimal totalCost = serviceCosts.values()
-                .stream() // stream이 무슨 역할을 하는거지?
+                .stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new MonthlyCostBreakdownResponse(

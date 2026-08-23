@@ -211,3 +211,82 @@ newCost = 새로운 비용 (추가한 비용)
 
 `BigDecimal`은 값을 직접 변경하지 않는 불변 객체이므로 `add()`가 새로운 합계 객체를 반환하고, 
 `merge()`가 그 결과를 다시 Map에 저장함
+
+--------------------------------
+
+### Stream과 reduce를 이용한 비용 합산
+
+다음 코드는 서비스별 비용이 들어 있는 Map에서 모든 비용을 더해 총비용을 계산한다.
+
+BigDecimal totalCost = serviceCosts.values()
+        .stream()
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+#### `values()`의 역할
+
+`serviceCosts`의 타입은 다음과 같다.
+
+Map<CloudService, BigDecimal>
+
+예를 들어 Map에 다음 값이 저장돼 있다고 가정한다.
+
+EC2 = 4000
+RDS = 2000
+S3 = 0
+
+`values()`를 호출하면 키를 제외하고 비용 값들만 가져온다.
+
+serviceCosts.values()
+
+결과는 다음과 같은 값의 모음이다.
+[4000, 2000, 0]
+
+#### `stream()`의 역할
+
+`stream()`은 컬렉션의 값을 하나씩 순서대로 처리할 수 있는 Stream 흐름으로 변환한다.
+
+serviceCosts.values().stream()
+
+Stream은 데이터를 직접 저장하는 자료구조가 아니다. 
+기존 컬렉션의 데이터를 대상으로 필터링, 변환, 합산 등의 연산을 연결해서 실행할 수 있도록 만든 처리 흐름이다.
+
+`stream()`을 호출하는 것만으로는 값이 변경되거나 합산되지 않는다. 실제 처리는 `reduce()`와 같은 최종 연산이 호출될 때 실행된다.
+
+#### `reduce()`의 역할
+
+`reduce()`는 여러 값을 하나의 결과로 줄이는 최종 연산이다.
+
+.reduce(BigDecimal.ZERO, BigDecimal::add)
+
+첫 번째 인자인 `BigDecimal.ZERO`는 합산을 시작할 초기값이다.
+
+두 번째 인자인 `BigDecimal::add`는 기존 합계와 다음 비용을 더하는 방법이다.
+
+(currentTotal, nextCost) -> currentTotal.add(nextCost)
+
+실제 계산 흐름은 다음과 같다.
+
+초기값: 0
+
+0 + 4000 = 4000
+4000 + 2000 = 6000
+6000 + 0 = 6000
+
+최종 결과: 6000
+
+초기값으로 0을 사용하는 이유는 어떤 값에 0을 더해도 원래 값이 유지되기 때문이다. 비용 데이터가 하나도 없는 빈 Stream이어도 결과로 0을 반환할 수 있다.
+
+#### 반복문과 비교
+
+Stream을 사용하지 않으면 다음 반복문과 같은 의미다.
+
+BigDecimal totalCost = BigDecimal.ZERO;
+
+for (BigDecimal cost : serviceCosts.values()) {
+    totalCost = totalCost.add(cost);
+}
+
+두 코드는 같은 결과를 만든다.
+
+Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “여러 비용을 하나의 합계로 줄인다”는 목적을 표현할 수 있다는 장점이 있다.
+
+또한 Stream으로 합산해도 기존 `serviceCosts` Map의 값은 변경되지 않는다.

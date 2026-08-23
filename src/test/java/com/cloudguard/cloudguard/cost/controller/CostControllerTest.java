@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -107,5 +108,34 @@ class CostControllerTest {
 
         verify(costService).calculateMonthlyCostByService(yearMonth,service);
 
+    }
+
+    @Test
+    void 월별_전체_서비스_비용_상세조회() throws Exception {
+        YearMonth yearMonth = YearMonth.of(2027,3);
+        Map<CloudService, BigDecimal> serviceCosts = Map.of(
+                CloudService.EC2, BigDecimal.valueOf(4000),
+                CloudService.RDS, BigDecimal.valueOf(2000),
+                CloudService.S3, BigDecimal.ZERO
+        );
+
+        given(costService.calculateMonthlyCostBreakdown(yearMonth))
+                .willReturn(serviceCosts);
+
+        mockMvc.perform(get("/api/costs/monthly/breakdown")
+                .param("yearMonth","2027-03"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.yearMonth")
+                        .value("2027-03"))
+                .andExpect(jsonPath("$.totalCost")
+                        .value(6000))
+                .andExpect(jsonPath("$.serviceCosts.EC2")
+                        .value(4000))
+                .andExpect(jsonPath("$.serviceCosts.RDS")
+                        .value(2000))
+                .andExpect(jsonPath("$.serviceCosts.S3")
+                        .value(0));
+
+        verify(costService).calculateMonthlyCostBreakdown(yearMonth);
     }
 }
