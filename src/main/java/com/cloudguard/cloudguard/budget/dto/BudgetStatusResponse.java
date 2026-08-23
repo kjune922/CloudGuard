@@ -10,7 +10,7 @@ public class BudgetStatusResponse {
     private final YearMonth yearMonth;
     private final BigDecimal monthlyLimit;
     private final BigDecimal totalCost;
-    private final BigDecimal usageRage;
+    private final BigDecimal usageRate;
     private final BudgetStatus status;
 
 
@@ -18,7 +18,7 @@ public class BudgetStatusResponse {
         this.yearMonth = yearMonth;
         this.monthlyLimit = monthlyLimit;
         this.totalCost = totalCost;
-        this.usageRage = usageRage;
+        this.usageRate = usageRage;
         this.status = status;
     }
 
@@ -35,7 +35,7 @@ public class BudgetStatusResponse {
     }
 
     public BigDecimal getUsageRage() {
-        return usageRage;
+        return usageRate;
     }
 
     public BudgetStatus getStatus() {
