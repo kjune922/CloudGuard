@@ -153,3 +153,61 @@ POSTMAN 활용해서 DB 중복 데이터에 대해 에러발생하는지 확인
 ![img_4.png](img_4.png)
 
 ![img_5.png](img_5.png)
+
+
+## 2026-08-23
+
+### EnumMap과 merge를 이용한 서비스별 비용 합산 <개념숙지체크>
+
+`EnumMap`은 enum 타입을 키로 사용할 때 특화된 `Map` 구현체다.
+
+Map<CloudService, BigDecimal> totals =
+        new EnumMap<>(CloudService.class);
+
+여기서 각 타입의 의미는 다음과 같다.
+
+* `CloudService`: Map의 키 타입
+* `BigDecimal`: Map에 저장되는 비용의 타입
+* `CloudService.class`: EnumMap이 어떤 enum을 키로 사용하는지 알려주는 정보
+
+`CloudService.values()`는 `EnumMap`의 메서드가 아니라 모든 enum에 자동으로 제공되는 정적 메서드다. 선언된 모든 enum 상수를 순서대로 배열로 반환한다.
+
+for (CloudService service : CloudService.values()) {
+    totals.put(service, BigDecimal.valueOf(0));
+}
+
+현재 `CloudService`에는 `EC2`, `RDS`, `S3`가 있으므로 처음 Map은 다음 상태가 된다.
+
+EC2 = 0
+RDS = 0
+S3 = 0
+
+이렇게 모든 서비스를 0으로 초기화하면 해당 월에 비용 기록이 없는 서비스도 결과에서 누락되지 않고 0으로 반환할 수 있다.
+
+`Map.merge()`는 기존 값의 존재 여부에 따라 값을 저장하거나 합산한다.
+
+totals.merge(
+        costRecord.getService(),
+        costRecord.getCost(),
+        BigDecimal::add
+);
+
+`merge()`의 동작은 다음과 같다.
+
+* 키가 없으면 전달받은 값을 새로 저장한다.
+* 키가 있으면 기존 값과 새로운 값에 지정한 함수를 적용한다.
+
+`BigDecimal::add`는 다음 람다식과 같은 의미의 메서드 참조다.
+
+existingCost = 이미 존재하고있는 비용 (기존비용)
+newCost = 새로운 비용 (추가한 비용)
+
+(existingCost, newCost) -> existingCost.add(newCost)
+
+예를 들어 EC2의 초기값이 0이고 비용 기록이 3000, 1000 순서로 들어오면 다음처럼 계산된다.
+
+0 + 3000 = 3000
+3000 + 1000 = 4000
+
+`BigDecimal`은 값을 직접 변경하지 않는 불변 객체이므로 `add()`가 새로운 합계 객체를 반환하고, 
+`merge()`가 그 결과를 다시 Map에 저장함
