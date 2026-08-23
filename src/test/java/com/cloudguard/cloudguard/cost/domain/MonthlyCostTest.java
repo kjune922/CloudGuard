@@ -73,9 +73,9 @@ public class MonthlyCostTest {
 
         // march는 3월
         Map<CloudService,BigDecimal> totals =
-                monthlyCost.calculateTotalByService(YearMonth.of(2027,3));
+                monthlyCost.calculateTotalsByService(YearMonth.of(2027,3));
 
-        Assertions.assertThat(totals).hasSize(3);
+        Assertions.assertThat(totals).hasSize(3); // enum서비스 초기화 검증 -> 초기화시 EC2, RDS, S3 3개임
         Assertions.assertThat(totals.get(CloudService.EC2))
                 .isEqualByComparingTo(BigDecimal.valueOf(4000));
         Assertions.assertThat(totals.get(CloudService.RDS))

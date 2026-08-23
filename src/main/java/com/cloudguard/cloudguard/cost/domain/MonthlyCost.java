@@ -33,7 +33,7 @@ public class MonthlyCost {
         return total;
     }
 
-    public Map<CloudService,BigDecimal> calculateTotalByService(YearMonth yearMonth){
+    public Map<CloudService,BigDecimal> calculateTotalsByService(YearMonth yearMonth){
         if(yearMonth == null){
             throw new IllegalArgumentException("조회할 연월은 필수입니다.");
         }
