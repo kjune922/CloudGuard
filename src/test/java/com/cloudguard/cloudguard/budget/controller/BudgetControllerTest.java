@@ -2,6 +2,7 @@ package com.cloudguard.cloudguard.budget.controller;
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
 import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import java.math.BigDecimal;
@@ -36,15 +36,33 @@ class BudgetControllerTest {
     void 월_예산_상태_조회() throws Exception {
         YearMonth yearMonth = YearMonth.of(2026,8);
 
-        given(budgetService.determineMonthlyStatus(
+        BudgetStatusResponse response = new BudgetStatusResponse(
+                yearMonth,
+                BigDecimal.valueOf(1000),
+                BigDecimal.valueOf(800),
+                BigDecimal.valueOf(80),
+                BudgetStatus.CAUTION
+        );
+
+        given(budgetService.determineMonthlyStatusDetail(
                 yearMonth
-        )).willReturn(BudgetStatus.CAUTION);
+        )).willReturn(response);
 
         mockMvc.perform(get("/api/budgets/status")
-                .param("yearMonth","2026-08"))
+                        .param("yearMonth", "2026-08"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("\"CAUTION\""));
-        verify(budgetService).determineMonthlyStatus(
+                .andExpect(jsonPath("$.yearMonth")
+                        .value("2026-08"))
+                .andExpect(jsonPath("$.monthlyLimit")
+                        .value(1000))
+                .andExpect(jsonPath("$.totalCost")
+                        .value(800))
+                .andExpect(jsonPath("$.usageRate")
+                        .value(80))
+                .andExpect(jsonPath("$.status")
+                        .value("CAUTION"));
+
+        verify(budgetService).determineMonthlyStatusDetail(
                 yearMonth
         );
     }
@@ -81,14 +99,14 @@ class BudgetControllerTest {
     void 등록되지않은_연월의_상태조회는_404() throws Exception{
         YearMonth yearMonth = YearMonth.of(2026,10);
 
-        given(budgetService.determineMonthlyStatus(yearMonth))
+        given(budgetService.determineMonthlyStatusDetail(yearMonth))
                 .willThrow(new MonthlyBudgetNotFoundException());
 
         mockMvc.perform(get("/api/budgets/status")
                 .param("yearMonth","2026-10"))
                 .andExpect(status().isNotFound());
 
-        verify(budgetService).determineMonthlyStatus(yearMonth);
+        verify(budgetService).determineMonthlyStatusDetail(yearMonth);
     }
 
     @Test

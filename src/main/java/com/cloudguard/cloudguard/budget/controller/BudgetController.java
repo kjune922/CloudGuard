@@ -4,6 +4,7 @@ package com.cloudguard.cloudguard.budget.controller;
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
 import com.cloudguard.cloudguard.budget.dto.BudgetCreateRequest;
+import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
 import com.cloudguard.cloudguard.budget.dto.BudgetUpdateRequest;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,13 +21,16 @@ public class BudgetController {
         this.budgetService = budgetService;
     }
 
+    // 기존 상태 -> 상세 상태반환으로 업데이트
     @GetMapping("/status")
-    public BudgetStatus determineMonthlyStatus(
+    public BudgetStatusResponse determineMonthlyStatus(
             @RequestParam("yearMonth")
             @DateTimeFormat (pattern = "yyyy-MM")
             YearMonth yearMonth
     ){
-            return budgetService.determineMonthlyStatus(yearMonth);
+            return budgetService.determineMonthlyStatusDetail(
+                    yearMonth
+            );
     }
 
     @PostMapping("/add")
