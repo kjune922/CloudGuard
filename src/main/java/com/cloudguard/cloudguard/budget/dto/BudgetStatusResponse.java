@@ -34,7 +34,7 @@ public class BudgetStatusResponse {
         return totalCost;
     }
 
-    public BigDecimal getUsageRage() {
+    public BigDecimal getUsageRate() {
         return usageRate;
     }
 

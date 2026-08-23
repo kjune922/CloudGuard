@@ -2,6 +2,7 @@ package com.cloudguard.cloudguard.budget.service;
 
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
+import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
 import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
@@ -14,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.swing.text.html.parser.Entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -138,5 +137,37 @@ class BudgetServiceTest {
         assertThat(updatedBudget.getMonthlyLimit()).isEqualByComparingTo(BigDecimal.valueOf(2000));
     }
 
+    @Test
+    void 월_예산상태_상세정보_반환() {
+        YearMonth yearMonth = YearMonth.of(2027,11);
+        BigDecimal monthlyLimit = BigDecimal.valueOf(1000);
 
+        monthlyBudgetRepository.save(new MonthlyBudget(yearMonth,monthlyLimit));
+
+        costRecordRepository.save(new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(200),
+                LocalDate.of(2027,11,1)
+        ));
+
+        costRecordRepository.save(new CostRecord(
+                CloudService.S3,
+                BigDecimal.valueOf(300),
+                LocalDate.of(2027,11,15)
+        ));
+
+        costRecordRepository.save(new CostRecord(
+                CloudService.RDS,
+                BigDecimal.valueOf(300),
+                LocalDate.of(2027,11,30)
+        ));
+
+        BudgetStatusResponse response = budgetService.determineMonthlyStatusDetail(yearMonth);
+
+        assertThat(response.getYearMonth()).isEqualTo(yearMonth);
+        assertThat(response.getMonthlyLimit()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(response.getTotalCost()).isEqualByComparingTo(BigDecimal.valueOf(800));
+        assertThat(response.getUsageRate()).isEqualByComparingTo(BigDecimal.valueOf(80));
+        assertThat(response.getStatus()).isEqualTo(BudgetStatus.CAUTION);
+    }
 }
