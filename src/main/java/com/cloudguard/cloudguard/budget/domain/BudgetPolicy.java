@@ -49,7 +49,7 @@ public class BudgetPolicy {
         }
     }
 
-    private BigDecimal calculateUsageRate(BigDecimal currentCost) {
+    public BigDecimal calculateUsageRate(BigDecimal currentCost) {
         validateCurrentCost(currentCost);
 
         return currentCost

@@ -296,3 +296,26 @@ Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “�
 ![img_6.png](img_6.png)
 
 월별 비용 상세 기능 도메인,Repository,Service,Controller,실제 DB 까지 완료
+
+--------------------------------------------
+
+다음단계로 현재 예산 상태 API를 상세 응답으로 업데이트 진행
+
+현재는 `SAFE` 라는 STATUS만 나옴
+
+목표는
+
+`{
+    "yearMonth" : "2028-02",
+    "monthlyLimit": 10000,
+    "totalCost": 5000,
+    "usageRate": 50.0000,
+    "status": "SAFE"
+}
+`
+
+이제 사용률을 외부에서도 가져올수 있도록 BudgetPolicy의 기존 private을 public으로 교체
+- 왜? 사용률 계산 규칙의 책임은 BudgetPolicy에 있기 떄문
+- Controller : HTTP 요청 & 응답
+- Service : 예산과 비용 조회 및 흐름 조정
+- BudgetPolicy : 사용률 계산과 상태 판정

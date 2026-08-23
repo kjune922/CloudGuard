@@ -69,4 +69,13 @@ public class BudgetPolicyTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 비용은 0 이상이어야 합니다 !!");
     }
+
+    @Test
+    void 월_예산과_현재비용으로_사용률을_계산한다() {
+        BudgetPolicy policy = new BudgetPolicy(BigDecimal.valueOf(10000));
+
+        BigDecimal usageRate = policy.calculateUsageRate(BigDecimal.valueOf(5000));
+
+        assertThat(usageRate).isEqualByComparingTo(BigDecimal.valueOf(50));
+    }
 }
