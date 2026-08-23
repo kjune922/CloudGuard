@@ -103,7 +103,7 @@ class CostServiceTest {
     }
 
     @Test
-    void 월별_전체_서비스_비용을_DB에서_조회하고합산() {
+    void 월별_전체_서비스_비용을_DB에서_조회하고_합산() {
         CostRecord marchEc2First = new CostRecord(
                 CloudService.EC2,
                 BigDecimal.valueOf(3000),
