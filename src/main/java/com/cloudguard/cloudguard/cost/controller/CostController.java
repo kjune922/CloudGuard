@@ -3,6 +3,7 @@ package com.cloudguard.cloudguard.cost.controller;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.dto.CostCreateRequest;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
+import com.cloudguard.cloudguard.cost.dto.MonthlyCostBreakdownResponse;
 import com.cloudguard.cloudguard.cost.dto.MonthlyCostResponse;
 import com.cloudguard.cloudguard.cost.dto.MonthlyServiceCostResponse;
 import com.cloudguard.cloudguard.cost.service.CostService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/costs")
@@ -57,6 +59,26 @@ public class CostController {
                 yearMonth,
                 service,
                 totalCost
+        );
+    }
+
+    @GetMapping("/monthly/breakdown")
+    public MonthlyCostBreakdownResponse getMonthlyCostBreakdown(
+            @RequestParam("yearMonth")
+            @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth
+    ){
+        Map<CloudService, BigDecimal> serviceCosts =
+                costService.calculateMonthlyCostBreakdown(yearMonth);
+
+        // stream과 reduce에 대한 개념 필요
+        BigDecimal totalCost = serviceCosts.values()
+                .stream() // stream이 무슨 역할을 하는거지?
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new MonthlyCostBreakdownResponse(
+                yearMonth,
+                totalCost,
+                serviceCosts
         );
     }
 }
