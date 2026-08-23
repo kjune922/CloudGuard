@@ -290,3 +290,9 @@ for (BigDecimal cost : serviceCosts.values()) {
 Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “여러 비용을 하나의 합계로 줄인다”는 목적을 표현할 수 있다는 장점이 있다.
 
 또한 Stream으로 합산해도 기존 `serviceCosts` Map의 값은 변경되지 않는다.
+
+-------------------------------------------
+
+![img_6.png](img_6.png)
+
+월별 비용 상세 기능 도메인,Repository,Service,Controller,실제 DB 까지 완료
