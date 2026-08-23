@@ -46,7 +46,7 @@ class CostControllerTest {
 
         mockMvc.perform(post("/api/costs/add-cost")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content("""    
                         {
                             "cloudService" : "EC2",
                             "cost": 800,
@@ -83,5 +83,29 @@ class CostControllerTest {
                         .value(5000));
 
         verify(costService).calculateMonthlyCost(yearMonth);
+    }
+
+    @Test
+    void 서비스별_월_누적_비용조회() throws Exception{
+        YearMonth yearMonth = YearMonth.of(2027,3);
+        CloudService service = CloudService.EC2;
+        BigDecimal totalCost = BigDecimal.valueOf(4000);
+
+        given(costService.calculateMonthlyCostByService(yearMonth,service))
+                .willReturn(totalCost);
+
+        mockMvc.perform(get("/api/costs/monthly/by-service")
+                .param("yearMonth","2027-03")
+                .param("service","EC2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.yearMonth")
+                        .value("2027-03"))
+                .andExpect(jsonPath("$.service")
+                        .value("EC2"))
+                .andExpect(jsonPath("$.totalCost")
+                        .value("4000"));
+
+        verify(costService).calculateMonthlyCostByService(yearMonth,service);
+
     }
 }
