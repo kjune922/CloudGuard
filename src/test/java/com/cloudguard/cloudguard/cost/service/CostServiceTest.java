@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Map;
 
 @Transactional
 @SpringBootTest
@@ -100,5 +100,46 @@ class CostServiceTest {
 
         Assertions.assertThat(totalCost)
                 .isEqualByComparingTo(BigDecimal.valueOf(4000));
+    }
+
+    @Test
+    void 월별_전체_서비스_비용을_DB에서_조회하고합산() {
+        CostRecord marchEc2First = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(3000),
+                LocalDate.of(2027,3,1)
+        );
+        CostRecord marchEc2Second = new CostRecord(
+                CloudService.EC2,
+                BigDecimal.valueOf(1000),
+                LocalDate.of(2027,3,31)
+        );
+        CostRecord marchRds = new CostRecord(
+                CloudService.RDS,
+                BigDecimal.valueOf(2000),
+                LocalDate.of(2027,3,15)
+        );
+        CostRecord aprilS3 = new CostRecord(
+                CloudService.S3,
+                BigDecimal.valueOf(9000),
+                LocalDate.of(2027,4,1)
+        );
+
+        costRecordRepository.save(marchEc2First);
+        costRecordRepository.save(marchEc2Second);
+        costRecordRepository.save(marchRds);
+        costRecordRepository.save(aprilS3);
+
+        Map<CloudService, BigDecimal> totals = costService.calculateMonthlyCostBreakdown(
+                YearMonth.of(2027,3)
+        );
+
+        Assertions.assertThat(totals).hasSize(3);
+        Assertions.assertThat(totals.get(CloudService.EC2))
+                .isEqualByComparingTo(BigDecimal.valueOf(4000));
+        Assertions.assertThat(totals.get(CloudService.RDS))
+                .isEqualByComparingTo(BigDecimal.valueOf(2000));
+        Assertions.assertThat(totals.get(CloudService.S3))
+                .isEqualByComparingTo(BigDecimal.ZERO);
     }
 }
