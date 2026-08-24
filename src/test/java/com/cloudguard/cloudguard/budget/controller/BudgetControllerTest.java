@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -204,12 +205,6 @@ class BudgetControllerTest {
     }
     @Test
     void 월_예산을_0이하로_변경하면_400() throws Exception{
-        YearMonth yearMonth = YearMonth.of(2026,8);
-        BigDecimal badUpdateLimit = BigDecimal.valueOf(0);
-
-        given(budgetService.updateMonthlyBudget(yearMonth,badUpdateLimit))
-                .willThrow(new WrongRequestBadRequestException());
-
         mockMvc.perform(put("/api/budgets/2026-08")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -221,15 +216,12 @@ class BudgetControllerTest {
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.code")
-                        .value("INVALID_MONTHLY_LIMIT"))
+                        .value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message")
                         .value("월 예산은 0보다 커야 합니다."))
                 .andExpect(jsonPath("$.path")
                         .value("/api/budgets/2026-08"));
 
-        verify(budgetService).updateMonthlyBudget(
-                yearMonth,
-                badUpdateLimit
-        );
+        verifyNoInteractions(budgetService);
     }
 }

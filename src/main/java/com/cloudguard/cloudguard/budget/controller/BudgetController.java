@@ -5,6 +5,7 @@ import com.cloudguard.cloudguard.budget.dto.BudgetCreateRequest;
 import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
 import com.cloudguard.cloudguard.budget.dto.BudgetUpdateRequest;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import java.time.YearMonth;
@@ -32,7 +33,9 @@ public class BudgetController {
     }
 
     @PostMapping("/add")
-    public MonthlyBudget addMonthlyBudget(@RequestBody BudgetCreateRequest request){
+    public MonthlyBudget addMonthlyBudget(
+            @Valid @RequestBody BudgetCreateRequest request
+    ){
         return budgetService.addMonthlyBudget(request.getYearMonth(),request.getMonthlyLimit());
     }
 
@@ -40,7 +43,7 @@ public class BudgetController {
     public MonthlyBudget updateMonthlyBudget(
             @PathVariable("yearMonth")
             @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
-            @RequestBody BudgetUpdateRequest request) {
+            @Valid @RequestBody BudgetUpdateRequest request) {
 
         return budgetService.updateMonthlyBudget(yearMonth,request.getMonthlyLimit());
     }

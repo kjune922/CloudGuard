@@ -4,8 +4,10 @@ import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetExceptio
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,7 +24,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(
                 HttpStatus.NOT_FOUND,
                 "MONTHLY_BUDGET_NOT_FOUND",
-                exception,
+                exception.getMessage(),
                 request
         );
     }
@@ -35,7 +37,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(
                 HttpStatus.CONFLICT,
                 "DUPLICATE_MONTHLY_BUDGET",
-                exception,
+                exception.getMessage(),
                 request
         );
     }
@@ -48,7 +50,27 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "INVALID_MONTHLY_LIMIT",
-                exception,
+                exception.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+    ) {
+        String message = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("잘못된 요청입니다.");
+
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                message,
                 request
         );
     }
@@ -56,16 +78,18 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String code,
-            RuntimeException exception,
+            String message,
             HttpServletRequest request
     ) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 status.value(),
                 code,
-                exception.getMessage(),
+                message,
                 request.getRequestURI()
         );
         return ResponseEntity.status(status).body(response);
     }
+
+
 }
