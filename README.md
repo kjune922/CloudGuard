@@ -343,3 +343,33 @@ Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “�
 
 ![img_7.png](img_7.png)
 상세 예산 업데이트 설정 성공
+
+# 2026-08-24
+
+현재 예외마다 @ResponseStatus가 있어서 HTTP 상태 코드는 맞지만, 응답 본문은 Spring 기본 형식
+이에 따라 다음처럼 일관된 응답으로 업데이트
+```json
+{
+"timestamp": "2026-08-24T14:00:00",
+"status": 404,
+"code": "MONTHLY_BUDGET_NOT_FOUND",
+"message": "해당 연월의 예산이 등록되어 있지 않습니다.",
+"path": "/api/budgets/status"
+}
+```
+
+common << 공통 모듈을 모아놓는 패키지로 설정
+common.exception 으로 공통예외를 모아놓을 예정
+
+- 예산 예외
+- 비용 예외
+- 잘못된 요청 파라미터
+- AWS 연동 예외
+- CloudWatch 연동 예외
+
+<각 변수들 설명>
+timestamp : 예외가 응답된 시각
+status : HTTP 상태 코드
+code : 클라이언트가 구분할 애플리케이션 오류 코드
+message : 사람이 확인할 오류 설명
+path : 예외가 발생한 요청 경로
