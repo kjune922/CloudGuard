@@ -428,3 +428,28 @@ common.exception 으로 공통예외를 모아놓을 예정
 - code : 클라이언트가 구분할 애플리케이션 오류 코드
 - message : 사람이 확인할 오류 설명
 - path : 예외가 발생한 요청 경로
+
+### @RestControllerAdvice는 무엇인가?
+
+- 여러 Controller에서 발생하는 예외를 한곳에서 공통 처리하도록 등록하는 어노테이션
+- @ControllerAdvice + @ResponseBody 와 같음
+- @ControllerAdvice : 모든 Controller에서 발생한 예외 감시
+- @ResponseBody : 반환한 ErrorResponse를 JSON으로 변환
+
+- BudgetController 실행
+  → BudgetService에서 MonthlyBudgetNotFoundException 발생
+  → Controller 밖으로 예외 전달
+  → @RestControllerAdvice가 예외 감지
+  → 해당 @ExceptionHandler 메서드 실행
+  → ErrorResponse를 JSON으로 반환
+
+- @ExceptionHandler는 어떤 예외를 처리할지 지정
+
+```java
+@ExceptionHandler(MonthlyBudgetNotFoundException.class)
+```
+`MonthlyBudgetNotFoundException`이 발생하면 바로 Handler밑의 메소드가 처리
+
+클래스에 `Global`를 붙인 이유는?
+- 특정 Controller 전용이 아닌 애플리케이션 전체 Controller에 적용할 예외 처리 클래스란 뜻
+전역 동작을 만드는건 `@RestControllerAdvice` 덕분

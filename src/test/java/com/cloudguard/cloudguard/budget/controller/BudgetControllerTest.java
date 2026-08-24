@@ -103,8 +103,16 @@ class BudgetControllerTest {
                 .willThrow(new MonthlyBudgetNotFoundException());
 
         mockMvc.perform(get("/api/budgets/status")
-                .param("yearMonth","2026-10"))
-                .andExpect(status().isNotFound());
+                        .param("yearMonth", "2026-10"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.code")
+                        .value("MONTHLY_BUDGET_NOT_FOUND"))
+                .andExpect(jsonPath("$.message")
+                        .value("해당 연월의 예산이 등록되어 있지 않습니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/status"));
 
         verify(budgetService).determineMonthlyStatusDetail(yearMonth);
     }

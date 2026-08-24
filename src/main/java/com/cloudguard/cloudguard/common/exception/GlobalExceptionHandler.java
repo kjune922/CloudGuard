@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 status.value(),
-                "MONHTLY_BUDGET_NOT_FOUND",
+                "MONTHLY_BUDGET_NOT_FOUND",
                 exception.getMessage(),
                 request.getRequestURI()
         );
