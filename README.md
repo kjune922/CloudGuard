@@ -460,3 +460,79 @@ common.exception 으로 공통예외를 모아놓을 예정
 ![img_10.png](img_10.png)
 3. 잘못된 예산 변경 - 400
 ![img_11.png](img_11.png)
+
+
+### `@Valid` 검증 오류 메시지 추출 과정 <새로알게된 개념>
+
+요청 DTO에 `@NotNull`, `@Positive` 등의 검증 규칙을 선언하고 Controller의 `@RequestBody` 앞에 `@Valid`를 적용했다.
+
+잘못된 요청이 들어오면 Controller와 Service를 실행하기 전에 DTO 검증이 수행되고, 검증 실패 시 `MethodArgumentNotValidException`이 발생한다.
+
+```text
+JSON 요청
+→ Jackson이 요청 DTO 생성
+→ @Valid가 DTO 검증
+→ 검증 실패
+→ MethodArgumentNotValidException 발생
+→ GlobalExceptionHandler가 공통 오류 응답 생성
+```
+
+검증 오류 메시지는 다음 코드로 추출한다.
+
+```java
+String message = exception.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .findFirst()
+        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+        .orElse("잘못된 요청입니다.");
+```
+
+각 메서드의 역할은 다음과 같다.
+
+* `getBindingResult()`: `@Valid`가 수행한 전체 검증 결과를 가져온다.
+* `getFieldErrors()`: 전체 검증 결과 중 DTO 필드에서 발생한 오류들을 `List<FieldError>`로 가져온다.
+* `stream()`: 필드 오류 목록을 순서대로 처리할 수 있는 Stream으로 변환한다.
+* `findFirst()`: 오류 목록 중 첫 번째 오류를 `Optional<FieldError>`로 가져온다.
+* `map()`: `FieldError`에서 어노테이션에 작성한 검증 메시지만 추출한다.
+* `orElse()`: 검증 메시지를 가져오지 못한 경우 기본 메시지를 반환한다.
+
+다음 메서드 참조는:
+
+```java
+DefaultMessageSourceResolvable::getDefaultMessage
+```
+
+아래 람다식과 같은 의미다.
+
+```java
+fieldError -> fieldError.getDefaultMessage()
+```
+
+예를 들어 다음 요청이 들어오면:
+
+```json
+{
+  "monthlyLimit": 0
+}
+```
+
+`@Positive` 검증이 실패하고 다음 메시지가 추출된다.
+
+```text
+월 예산은 0보다 커야 합니다.
+```
+
+최종 처리 흐름은 다음과 같다.
+
+```text
+monthlyLimit = 0
+→ @Positive 검증 실패
+→ FieldError 생성
+→ 첫 번째 FieldError 선택
+→ 검증 메시지 추출
+→ ErrorResponse의 message에 저장
+→ 400 Bad Request 반환
+```
+
+현재 `ErrorResponse`는 메시지를 하나만 가지므로 여러 필드가 동시에 실패하더라도 첫 번째 오류 메시지만 반환한다. 추후 필요하면 모든 필드 오류를 목록으로 반환하는 구조로 확장할 수 있다.

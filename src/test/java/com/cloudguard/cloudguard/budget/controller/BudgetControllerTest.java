@@ -3,7 +3,6 @@ package com.cloudguard.cloudguard.budget.controller;
 import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
 import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
 import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
-import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -221,6 +220,28 @@ class BudgetControllerTest {
                         .value("월 예산은 0보다 커야 합니다."))
                 .andExpect(jsonPath("$.path")
                         .value("/api/budgets/2026-08"));
+
+        verifyNoInteractions(budgetService);
+    }
+
+    @Test
+    void 예산등록시_연월이_누락되면_400() throws Exception {
+        mockMvc.perform(post("/api/budgets/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                                "monthlyLimit": 1000
+                            }
+                            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message")
+                        .value("연월은 필수입니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/add"));
 
         verifyNoInteractions(budgetService);
     }
