@@ -421,9 +421,10 @@ common.exception 으로 공통예외를 모아놓을 예정
 - AWS 연동 예외
 - CloudWatch 연동 예외
 
-<각 변수들 설명>
-timestamp : 예외가 응답된 시각
-status : HTTP 상태 코드
-code : 클라이언트가 구분할 애플리케이션 오류 코드
-message : 사람이 확인할 오류 설명
-path : 예외가 발생한 요청 경로
+----각 변수 설명----
+
+- timestamp : 예외가 응답된 시각
+- status : HTTP 상태 코드
+- code : 클라이언트가 구분할 애플리케이션 오류 코드
+- message : 사람이 확인할 오류 설명
+- path : 예외가 발생한 요청 경로
