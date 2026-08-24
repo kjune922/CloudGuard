@@ -453,3 +453,13 @@ common.exception 으로 공통예외를 모아놓을 예정
 클래스에 `Global`를 붙인 이유는?
 - 특정 Controller 전용이 아닌 애플리케이션 전체 Controller에 적용할 예외 처리 클래스란 뜻
 전역 동작을 만드는건 `@RestControllerAdvice` 덕분
+
+----------------------------------
+
+### POSTMAN 테스트 진행
+1. 미등록 예산 조회 - 404
+![img_9.png](img_9.png)
+2. 중복 예산 등록 -409
+![img_10.png](img_10.png)
+3. 잘못된 예산 변경 - 400
+![img_11.png](img_11.png)
