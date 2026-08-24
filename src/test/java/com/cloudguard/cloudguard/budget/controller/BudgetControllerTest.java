@@ -211,13 +211,21 @@ class BudgetControllerTest {
                 .willThrow(new WrongRequestBadRequestException());
 
         mockMvc.perform(put("/api/budgets/2026-08")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
                         {
-                            "monthlyLimit" : 0
+                            "monthlyLimit": 0
                         }
                         """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("INVALID_MONTHLY_LIMIT"))
+                .andExpect(jsonPath("$.message")
+                        .value("월 예산은 0보다 커야 합니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/2026-08"));
 
         verify(budgetService).updateMonthlyBudget(
                 yearMonth,

@@ -2,6 +2,7 @@ package com.cloudguard.cloudguard.common.exception;
 
 import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
+import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,24 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 status.value(),
                 "DUPLICATE_MONTHLY_BUDGET",
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(WrongRequestBadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleWrongRequest(
+            WrongRequestBadRequestException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                "INVALID_MONTHLY_LIMIT",
                 exception.getMessage(),
                 request.getRequestURI()
         );
