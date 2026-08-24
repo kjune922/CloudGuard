@@ -19,17 +19,12 @@ public class GlobalExceptionHandler {
             MonthlyBudgetNotFoundException exception,
             HttpServletRequest request
     ) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                status.value(),
+        return buildErrorResponse(
+                HttpStatus.NOT_FOUND,
                 "MONTHLY_BUDGET_NOT_FOUND",
-                exception.getMessage(),
-                request.getRequestURI()
+                exception,
+                request
         );
-
-        return ResponseEntity.status(status).body(response);
     }
 
     @ExceptionHandler(DuplicateMonthlyBudgetException.class)
@@ -37,17 +32,12 @@ public class GlobalExceptionHandler {
             DuplicateMonthlyBudgetException exception,
             HttpServletRequest request
     ) {
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                status.value(),
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
                 "DUPLICATE_MONTHLY_BUDGET",
-                exception.getMessage(),
-                request.getRequestURI()
+                exception,
+                request
         );
-
-        return ResponseEntity.status(status).body(response);
     }
 
     @ExceptionHandler(WrongRequestBadRequestException.class)
@@ -55,16 +45,27 @@ public class GlobalExceptionHandler {
             WrongRequestBadRequestException exception,
             HttpServletRequest request
     ) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "INVALID_MONTHLY_LIMIT",
+                exception,
+                request
+        );
+    }
 
+    private ResponseEntity<ErrorResponse> buildErrorResponse(
+            HttpStatus status,
+            String code,
+            WrongRequestBadRequestException exception,
+            HttpServletRequest request
+    ) {
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),
                 status.value(),
-                "INVALID_MONTHLY_LIMIT",
+                code,
                 exception.getMessage(),
                 request.getRequestURI()
         );
-
         return ResponseEntity.status(status).body(response);
     }
 }

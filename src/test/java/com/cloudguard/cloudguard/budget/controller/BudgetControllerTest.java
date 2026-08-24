@@ -203,7 +203,7 @@ class BudgetControllerTest {
         );
     }
     @Test
-    void 월_예산을_0이하로_변경하거나_설정하면_400() throws Exception{
+    void 월_예산을_0이하로_변경하면_400() throws Exception{
         YearMonth yearMonth = YearMonth.of(2026,8);
         BigDecimal badUpdateLimit = BigDecimal.valueOf(0);
 
