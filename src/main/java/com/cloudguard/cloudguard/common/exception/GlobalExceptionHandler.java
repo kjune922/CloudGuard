@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String code,
-            WrongRequestBadRequestException exception,
+            RuntimeException exception,
             HttpServletRequest request
     ) {
         ErrorResponse response = new ErrorResponse(
