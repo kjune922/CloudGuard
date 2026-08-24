@@ -245,4 +245,25 @@ class BudgetControllerTest {
 
         verifyNoInteractions(budgetService);
     }
+
+    @Test
+    void 예산변경시_월예산이_누락되면_400() throws Exception{
+        mockMvc.perform(put("/api/budgets/2026-08")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message")
+                        .value("월 예산은 필수입니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/2026-08"));
+
+        verifyNoInteractions(budgetService);
+    }
 }
