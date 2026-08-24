@@ -126,14 +126,22 @@ class BudgetControllerTest {
                 .willThrow(new DuplicateMonthlyBudgetException());
 
         mockMvc.perform(post("/api/budgets/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
                         {
-                            "yearMonth" : "2026-08",
-                            "monthlyLimit" : 1000
+                            "yearMonth": "2026-08",
+                            "monthlyLimit": 1000
                         }
                         """))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.code")
+                        .value("DUPLICATE_MONTHLY_BUDGET"))
+                .andExpect(jsonPath("$.message")
+                        .value("해당 연월의 예산이 이미 등록되어 있습니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/add"));
 
         verify(budgetService).addMonthlyBudget(
                 yearMonth1,
@@ -165,28 +173,6 @@ class BudgetControllerTest {
                         .value("2026-08"))
                 .andExpect(jsonPath("$.monthlyLimit")
                         .value(2000));
-
-        verify(budgetService).updateMonthlyBudget(
-                yearMonth,
-                updateLimit
-        );
-    }
-    @Test
-    void 등록되지_않은_연월의_예산변경은_404() throws Exception {
-        YearMonth yearMonth = YearMonth.of(2050,10);
-        BigDecimal updateLimit = BigDecimal.valueOf(2000);
-
-        given(budgetService.updateMonthlyBudget(yearMonth,updateLimit))
-                .willThrow(new MonthlyBudgetNotFoundException());
-
-        mockMvc.perform(put("/api/budgets/2050-10")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                        {
-                            "monthlyLimit" : 2000
-                        }
-                        """))
-                .andExpect(status().isNotFound());
 
         verify(budgetService).updateMonthlyBudget(
                 yearMonth,

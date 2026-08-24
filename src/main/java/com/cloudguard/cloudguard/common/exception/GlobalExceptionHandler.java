@@ -1,5 +1,6 @@
 package com.cloudguard.cloudguard.common.exception;
 
+import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-@RestControllerAdvice // RestControllerAdvice는 왜 붙이고 어디에 쓰는거지?
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MonthlyBudgetNotFoundException.class)
@@ -23,6 +24,24 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 status.value(),
                 "MONTHLY_BUDGET_NOT_FOUND",
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(DuplicateMonthlyBudgetException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateMonthlyBudget (
+            DuplicateMonthlyBudgetException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                "DUPLICATE_MONTHLY_BUDGET",
                 exception.getMessage(),
                 request.getRequestURI()
         );
