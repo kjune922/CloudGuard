@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -214,6 +215,48 @@ class CostControllerTest {
                                 }
                                 """,
                         "비용 발생일은 필수입니다."
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCostRequestFormats")
+    void 비용등록시_요청형식이_잘못되면_400(String requestBody) throws Exception{
+        mockMvc.perform(post("/api/costs/add-cost")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("INVALID_REQUEST_FORMAT"))
+                .andExpect(jsonPath("$.message")
+                        .value("요청 형식이 올바르지 않습니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/costs/add-cost"));
+
+        verifyNoInteractions(costService);
+    }
+    static Stream<Arguments> invalidCostRequestFormats(){
+        return Stream.of(
+                Arguments.of(
+                        """
+                                {
+                                    "cloudService" : "LAMBDA",
+                                    "cost" : 1000,
+                                    "usageData" : "2026-08-26"
+                                }
+                                """
+                ),
+                Arguments.of(
+                        """
+                            {
+                                "cloudService" : "EC2",
+                                "cost" : 1000,
+                                "usageDate" : "2026-13-34"
+                            }
+                            """
                 )
         );
     }
