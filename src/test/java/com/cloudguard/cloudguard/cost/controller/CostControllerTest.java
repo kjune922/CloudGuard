@@ -4,6 +4,9 @@ import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -13,6 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Map;
+import java.util.stream.Stream;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -160,5 +165,56 @@ class CostControllerTest {
                         .value("/api/costs/add-cost"));
 
         verifyNoInteractions(costService);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCostCreateRequests")
+    void 비용등록시_필수값이_누락되면_400(String requestBody, String expectedMessage) throws Exception {
+        mockMvc.perform(post("/api/costs/add-cost")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message")
+                        .value(expectedMessage))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/costs/add-cost"));
+
+        verifyNoInteractions(costService);
+    }
+    static Stream<Arguments> invalidCostCreateRequests(){
+        return Stream.of(
+                Arguments.of(
+                        """
+                                {
+                                    "cost" : 1000,
+                                    "usageDate" : "2026-08-26"
+                                }
+                                """,
+                        "클라우드 서비스는 필수입니다."
+                ),
+                Arguments.of(
+                        """
+                                {
+                                    "cloudService" : "EC2",
+                                    "usageDate" : "2026-08-26"
+                                }
+                                """,
+                        "비용은 필수입니다."
+
+                ),
+                Arguments.of(
+                        """
+                                {
+                                    "cloudService" : "EC2",
+                                    "costs" : 1000
+                                }
+                                """,
+                        "비용 발생일은 필수입니다."
+                )
+        );
     }
 }
