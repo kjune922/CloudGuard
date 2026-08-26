@@ -15,6 +15,7 @@ import java.time.YearMonth;
 import java.util.Map;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -135,5 +136,29 @@ class CostControllerTest {
                         .value(0));
 
         verify(costService).calculateMonthlyCostBreakdown(yearMonth);
+    }
+
+    @Test
+    void 음수_비용을_등록하면_400() throws Exception{
+        mockMvc.perform(post("/api/costs/add-cost")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "cloudService" : "EC2",
+                            "cost" : -1000,
+                            "usageDate" : "2026-08-26"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message")
+                        .value("비용은 음수일 수 없습니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/costs/add-cost"));
+
+        verifyNoInteractions(costService);
     }
 }
