@@ -561,3 +561,120 @@ monthlyLimit = 0
 
 @RequestParam 또는 @PathVariable 변환 실패
 → MethodArgumentTypeMismatchException
+
+
+### `@ParameterizedTest`로 중복 테스트 제거 <- @Test로 3번할거 한번만에 가능
+
+비용 등록 요청에서 `cloudService`, `cost`, `usageDate`가 누락되는 세 가지 경우를 검증해야 했다.
+
+각 경우마다 별도의 `@Test`를 작성하면 요청수행과 응답 검증코드가 반복된다. 
+입력 JSON과 예상 메시지만 다르므로 `@ParameterizedTest`와 `@MethodSource`를 사용해 하나의 테스트를 여러 데이터로 실행했다.
+
+```java
+@ParameterizedTest
+@MethodSource("invalidCostCreateRequests")
+void 비용등록시_필수값이_누락되면_400(
+        String requestBody,
+        String expectedMessage
+) throws Exception {
+    mockMvc.perform(post("/api/costs/add-cost")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.timestamp").exists())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.code")
+                    .value("VALIDATION_ERROR"))
+            .andExpect(jsonPath("$.message")
+                    .value(expectedMessage))
+            .andExpect(jsonPath("$.path")
+                    .value("/api/costs/add-cost"));
+
+    verifyNoInteractions(costService);
+}
+```
+
+일반적인 `@Test`는 테스트 메서드를 한 번 실행하지만, 
+`@ParameterizedTest`는 전달된 데이터의 개수만큼 같은 테스트 메서드를 반복 실행한다.
+이는 이번 테스트를 구현해보면서 새롭게 알게되었다.
+
+```java
+@MethodSource("invalidCostCreateRequests")
+```
+
+`@MethodSource`는 테스트에 전달할 데이터를 제공하는 메서드 이름을 지정한다. 여기서는 `invalidCostCreateRequests()`가 반환하는 데이터를 사용한다.
+
+```java
+static Stream<Arguments> invalidCostCreateRequests() {
+    return Stream.of(
+            Arguments.of(
+                    """
+                    {
+                        "cost": 1000,
+                        "usageDate": "2026-08-26"
+                    }
+                    """,
+                    "클라우드 서비스는 필수입니다."
+            ),
+            Arguments.of(
+                    """
+                    {
+                        "cloudService": "EC2",
+                        "usageDate": "2026-08-26"
+                    }
+                    """,
+                    "비용은 필수입니다."
+            ),
+            Arguments.of(
+                    """
+                    {
+                        "cloudService": "EC2",
+                        "cost": 1000
+                    }
+                    """,
+                    "비용 발생일은 필수입니다."
+            )
+    );
+}
+```
+
+`Stream<Arguments>`는 테스트에 전달할 여러 매개변수 묶음을 제공한다.
+
+각 `Arguments.of()`의 첫 번째 값은 `requestBody`에, 두 번째 값은 `expectedMessage`에 전달된다.
+
+```text
+Arguments.of(요청 JSON, 예상 메시지)
+                 ↓           ↓
+          requestBody  expectedMessage
+```
+
+따라서 테스트는 총 세 번 실행된다.
+
+```text
+첫 번째 실행
+→ cloudService 누락
+→ "클라우드 서비스는 필수입니다."
+
+두 번째 실행
+→ cost 누락
+→ "비용은 필수입니다."
+
+세 번째 실행
+→ usageDate 누락
+→ "비용 발생일은 필수입니다."
+```
+
+각 실행에서 `@Valid`가 누락 필드를 발견하면 Controller 메서드와 `CostService`는 실행되지 않는다.
+
+```java
+verifyNoInteractions(costService);
+```
+
+이 검증을 통해 잘못된 요청이 서비스 계층에 전달되기 전에 차단되는 것도 확인한다.
+
+매개변수화 테스트를 사용할 때는 각 테스트 데이터가 의도한 규칙 하나만 실패하도록 구성해야 한다. 
+여러 필드가 동시에 잘못되면 `findFirst()`가 어떤 필드 오류를 선택하는지에 따라 테스트 결과가 달라질 수 있다.
+
+`@ParameterizedTest`를 사용하면서 반복되는 MockMvc 검증 코드를 제거하고, 검증 사례를 추가할 때 `Arguments.of()`만 추가할 수 있게 됐다.
+
+추가로 `costs` 라고 오타가난걸 `cost`로 다시 수정했다.

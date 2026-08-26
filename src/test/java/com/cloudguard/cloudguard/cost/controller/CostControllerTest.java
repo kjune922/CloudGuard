@@ -210,7 +210,7 @@ class CostControllerTest {
                         """
                                 {
                                     "cloudService" : "EC2",
-                                    "costs" : 1000
+                                    "cost" : 1000
                                 }
                                 """,
                         "비용 발생일은 필수입니다."
