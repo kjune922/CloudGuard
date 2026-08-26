@@ -282,8 +282,27 @@ class BudgetControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.code")
                         .value("INVALID_REQUEST_FORMAT"))
+                .andExpect(jsonPath("$.message")
+                        .value("요청 형식이 올바르지 않습니다."))
                 .andExpect(jsonPath("$.path")
                         .value("/api/budgets/add"));
+
+        verifyNoInteractions(budgetService);
+    }
+
+    @Test
+    void 상태조회시_연월형식이_잘못되면_400() throws Exception {
+        mockMvc.perform(get("/api/budgets/status")
+                .param("yearMonth","2099-13"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("INVALID_PARAMETER_FORMAT"))
+                .andExpect(jsonPath("$.message")
+                        .value("요청 파라미터 형식이 올바르지 않습니다."))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/status"));
 
         verifyNoInteractions(budgetService);
     }

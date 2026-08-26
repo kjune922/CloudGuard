@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -76,6 +77,35 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // JSON값의 형식 자체가 잘못된 경우 잡아냄
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request
+    ){
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "INVALID_REQUEST_FORMAT",
+                "요청 형식이 올바르지 않습니다.", // exception.getMessage()를 안쓰는 이유 readme.md 메모
+                request
+        );
+    }
+
+    // GET 쿼리 파라미터의 형식 오류 처리
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMissmatch(
+            MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "INVALID_PARAMETER_FORMAT",
+                "요청 파라미터 형식이 올바르지 않습니다.",
+                request
+        );
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status,
             String code,
@@ -91,19 +121,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(status).body(response);
     }
-
-    // JSON값의 형식 자체가 잘못된 경우 잡아냄
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException exception,
-            HttpServletRequest request
-    ){
-        return buildErrorResponse(
-                HttpStatus.BAD_REQUEST,
-                "INVALID_REQUEST_FORMAT",
-                "요청 형식이 올바르지 않습니다.", // exception.getMessage()를 안쓰는 이유 readme.md 메모
-                request
-        );
-    }
-
 }
