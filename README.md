@@ -548,3 +548,8 @@ monthlyLimit = 0
 
 ![img_13.png](img_13.png)
 
+# 2026-08-26
+
+- handleHttpMessageNotReadable 메소드에 return값으로
+- exception.getMessage()를 그대로 반환하지 않는 이유는 Jackson 내부 클래스와 변환 오류 같은 
+- 엄청 긴 기술 정보가 포함될수도 있음. -> 굳이 클라이언트에게 보낼필요없는 메세지까지 보낸다는 뜻

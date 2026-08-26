@@ -266,4 +266,25 @@ class BudgetControllerTest {
 
         verifyNoInteractions(budgetService);
     }
+
+    @Test
+    void 예산등록시_연월형식이_잘못되면_400() throws Exception {
+        mockMvc.perform(post("/api/budgets/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "yearMonth" : "2099-13",
+                            "monthlyLimit" : 1000
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code")
+                        .value("INVALID_REQUEST_FORMAT"))
+                .andExpect(jsonPath("$.path")
+                        .value("/api/budgets/add"));
+
+        verifyNoInteractions(budgetService);
+    }
 }
