@@ -682,3 +682,272 @@ verifyNoInteractions(costService);
 ![img_14.png](img_14.png)
 
 자동 수집 구조 설계 전 ./gradlew test 진행
+
+## AWS Cost Explorer 연동 시작
+
+기존 CloudGuard에서는 비용 데이터를 다음 API를 통해 직접 등록했다.
+
+```http
+POST /api/costs/add-cost
+```
+
+이 API는 비용 도메인과 예산 상태 계산을 구현하고 테스트하기 위한 입력 수단이었다. 실제 서비스에서는 사용자가 비용을 일일이 입력하는 것이 아니라, AWS Cost Explorer에서 계정의 비용 데이터를 자동으로 가져오는 구조가 필요하다.
+
+목표 흐름은 다음과 같다.
+
+```text
+AWS Cost Explorer
+→ 서비스별 비용 조회
+→ AWS 응답을 내부 DTO로 변환
+→ CloudGuard DB 저장
+→ 월 누적 비용 계산
+→ 예산 사용률 및 상태 판단
+```
+
+### AWS CLI 인증 확인
+
+로컬 개발 환경이 AWS 계정에 연결됐는지 확인했다.
+(본인의 AWS 계정을 활용했음)
+
+```bash
+aws --version
+aws sts get-caller-identity
+```
+
+`aws sts get-caller-identity`가 IAM 사용자 정보를 반환하면서 AWS CLI 자격 증명이 정상적으로 설정됐음을 확인했다.
+
+AWS Access Key와 Secret Key는 애플리케이션 코드나 `application.yml`, GitHub 저장소에 작성하지 않는다. << 중요하다 잊지마라
+
+로컬 환경에서는 AWS CLI에 설정된 자격 증명을 사용하고, 추후 EC2나 ECS에 배포할 때는 서버에 IAM Role을 부여한다. AWS SDK의 기본 자격 증명 체인을 사용하면 실행 환경에 따라 적절한 자격 증명을 자동으로 찾을 수 있다.
+
+```text
+로컬 실행
+→ AWS CLI 프로필의 자격 증명 사용
+
+배포 환경
+→ EC2 또는 ECS에 연결된 IAM Role 사용
+
+GitHub
+→ Access Key와 Secret Key를 저장하지 않음
+```
+
+### Cost Explorer 실제 비용 조회
+
+다음 명령으로 2026년 8월의 서비스별 비용을 조회했다.
+
+```bash
+aws ce get-cost-and-usage \
+  --time-period Start=2026-08-01,End=2026-08-27 \
+  --granularity MONTHLY \
+  --metrics UnblendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE \
+  --region ap-northeast-2
+```
+
+`End` 날짜는 조회 범위에 포함되지 않는다. 따라서 `2026-08-27`을 지정하면 `2026-08-26`까지의 비용이 조회된다.
+
+주요 옵션의 의미는 다음과 같다.
+
+| 옵션                        | 의미                  |
+| ------------------------- | ------------------- |
+| `--time-period`           | 비용을 조회할 기간          |
+| `--granularity MONTHLY`   | 월 단위 비용 조회          |
+| `--metrics UnblendedCost` | 할인 분배 전 실제 사용 비용 조회 |
+| `--group-by ... SERVICE`  | AWS 서비스별로 비용 분류     |
+| `--region ap-northeast-2` | API 요청에 사용할 리전      |
+
+실제 응답을 통해 다음 서비스들이 조회됐다.
+
+```text
+AWS Glue
+AWS Key Management Service
+EC2 - Other
+Amazon Simple Storage Service
+Tax
+```
+
+서비스별 비용은 다음 구조로 반환된다.
+
+```json
+{
+  "Keys": [
+    "Amazon Simple Storage Service"
+  ],
+  "Metrics": {
+    "UnblendedCost": {
+      "Amount": "0.0000000488",
+      "Unit": "USD"
+    }
+  }
+}
+```
+
+각 값의 의미는 다음과 같다.
+
+```text
+Keys[0]
+→ AWS가 사용하는 원본 서비스 이름
+
+Amount
+→ 해당 서비스에서 발생한 비용
+
+Unit
+→ 비용의 통화 단위
+```
+
+AWS는 비용을 문자열로 반환하므로 Java에서는 정확한 소수 계산을 위해 `double`이 아니라 `BigDecimal`로 변환한다.
+
+```java
+BigDecimal amount = new BigDecimal(amountValue);
+```
+
+응답의 다음 값도 확인했다.
+
+```json
+"Estimated": true
+```
+
+현재 청구 기간이 끝나지 않았기 때문에 아직 확정되지 않은 예상 비용이라는 의미다. 추후 CloudGuard에서도 비용의 상태를 알 수 있도록 `estimated`와 `lastSyncedAt` 같은 정보를 제공할 필요가 있다.
+
+`Total`이 빈 객체로 반환된 것도 오류가 아니다.
+
+```json
+"Total": {}
+```
+
+이번 요청은 `SERVICE`를 기준으로 그룹화했기 때문에 전체 합계 하나가 아니라 `Groups` 내부에 서비스별 비용이 들어간다.
+
+Cost Explorer 데이터는 완전한 실시간 데이터가 아니며 최소 하루 한 번 갱신된다. 일부 비용은 24시간보다 늦게 반영될 수도 있다. 또한 Cost Explorer API는 페이지 요청 단위로 비용이 발생하므로 지나치게 짧은 간격으로 호출하지 않고, 이후 스케줄러를 통해 적절한 주기로 수집할 예정이다.
+
+* [AWS Cost Explorer 소개](https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html)
+* [GetCostAndUsage API](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html)
+
+### AWS SDK for Java 의존성 추가
+
+CloudGuard에서 Cost Explorer API를 호출하기 위해 AWS SDK for Java 2.x 의존성을 추가했다.
+
+```groovy
+implementation platform('software.amazon.awssdk:bom:2.54.4')
+implementation 'software.amazon.awssdk:costexplorer'
+```
+
+`platform()`으로 선언한 BOM은 AWS SDK 모듈들의 버전을 통합해서 관리한다.
+
+```text
+AWS SDK BOM
+→ 여러 AWS SDK 모듈의 버전을 하나로 관리
+→ 모듈 사이의 버전 불일치 방지
+```
+
+따라서 `costexplorer` 의존성에는 버전을 별도로 작성하지 않는다.
+
+```groovy
+implementation 'software.amazon.awssdk:costexplorer'
+```
+
+### AWS 원본 응답을 별도 DTO로 관리하는 이유
+
+기존 CloudGuard의 `CloudService` enum에는 `EC2`, `RDS`, `S3`처럼 애플리케이션에서 사용하는 서비스가 정의돼 있다.
+
+하지만 AWS Cost Explorer의 실제 응답에는 다음처럼 다른 이름이 포함된다.
+
+```text
+Amazon Simple Storage Service
+EC2 - Other
+AWS Glue
+AWS Key Management Service
+Tax
+```
+
+AWS 응답을 바로 기존 `CloudService`로 변환하면, 
+enum에 없는 서비스가 반환될 때 자동 수집 전체가 실패할 수 있다.
+
+따라서 AWS에서 받은 데이터를 먼저 원본 형태로 보관하는 `AwsServiceCost` DTO를 추가했다.
+
+```java
+package com.cloudguard.cloudguard.cost.aws.dto;
+
+import java.math.BigDecimal;
+
+public class AwsServiceCost {
+
+    private final String serviceName;
+    private final BigDecimal amount;
+    private final String unit;
+
+    public AwsServiceCost(
+            String serviceName,
+            BigDecimal amount,
+            String unit
+    ) {
+        this.serviceName = serviceName;
+        this.amount = amount;
+        this.unit = unit;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+}
+```
+
+각 필드에는 다음 값이 들어간다.
+
+```text
+serviceName
+→ "Amazon Simple Storage Service"
+
+amount
+→ 0.0000000488
+
+unit
+→ "USD"
+```
+
+`AwsServiceCost`는 AWS 원본 응답을 CloudGuard 내부로 전달하는 DTO다. 아직 DB Entity가 아니며, 기존 `CostRecord`를 대체하지 않는다.
+
+```text
+AWS SDK 응답
+→ AwsServiceCost
+→ 서비스명 매핑
+→ CostRecord 또는 수집 전용 Entity
+→ DB 저장
+```
+
+이렇게 AWS 응답 DTO와 CloudGuard 도메인을 분리하면 다음과 같은 장점이 있다.
+
+* AWS의 서비스명이 변경되거나 추가돼도 도메인이 바로 깨지지 않는다.
+* AWS SDK의 응답 구조가 애플리케이션 전체로 퍼지는 것을 방지한다.
+* 외부 데이터와 내부 도메인 사이의 변환 규칙을 한곳에서 관리할 수 있다.
+* 테스트에서 AWS를 직접 호출하지 않고 `AwsServiceCost`를 만들어 사용할 수 있다.
+
+### 테스트 운영 원칙
+
+기존 테스트가 실행될 때마다 실제 AWS API를 호출하면 테스트 결과가 네트워크, 자격 증명, AWS 상태에 따라 달라진다. API 호출 비용도 계속 발생할 수 있다.
+
+따라서 일반 테스트와 실제 AWS 연동 검증을 분리한다.
+
+```text
+./gradlew test
+→ 실제 AWS 호출 없음
+→ AWS 연동 객체는 Mock으로 대체
+→ 빠르고 반복 가능한 테스트
+
+AWS 연동 테스트
+→ 별도 실행
+→ 로컬 AWS 자격 증명 필요
+→ 실제 Cost Explorer 응답 확인
+
+배포 환경
+→ IAM Role을 사용해 실제 비용 수집
+```
+
+현재까지 AWS CLI 인증과 실제 Cost Explorer 조회, AWS SDK 의존성 추가, AWS 원본 서비스 비용 DTO 설계를 완료했다.
