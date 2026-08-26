@@ -951,3 +951,98 @@ AWS 연동 테스트
 ```
 
 현재까지 AWS CLI 인증과 실제 Cost Explorer 조회, AWS SDK 의존성 추가, AWS 원본 서비스 비용 DTO 설계를 완료했다.
+
+### Spring Bean과 AWS Config
+
+Spring Bean은 Spring 컨테이너가 생성하고 관리하는 객체다.
+
+```text
+객체 생성
+→ 필요한 객체에 주입
+→ 하나의 객체 공유
+→ 애플리케이션 종료 시 정리
+```
+
+`Controller`, `Service`, `Repository`처럼 직접 만든 클래스는 역할에 맞는 어노테이션을 사용해 Bean으로 자동 등록한다.
+
+```text
+@RestController → Controller Bean
+@Service        → Service Bean
+@Repository     → Repository Bean
+```
+
+반면 `CostExplorerClient`는 AWS SDK에서 제공하는 외부 클래스이므로 클래스에 직접 `@Component`를 붙일 수 없다. 또한 리전과 같은 생성 설정이 필요하기 때문에 별도의 Config 클래스에서 Bean으로 등록했다.
+
+```java
+@Configuration
+public class AwsCostExplorerConfig {
+
+    @Bean
+    public CostExplorerClient costExplorerClient() {
+        return CostExplorerClient.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .build();
+    }
+}
+```
+
+`@Configuration`은 해당 클래스가 객체 생성과 설정을 담당하는 Spring 설정 클래스임을 나타낸다.
+
+`@Bean`은 메서드가 반환한 `CostExplorerClient`를 Spring 컨테이너에 등록한다.
+
+```text
+AwsCostExplorerConfig
+→ CostExplorerClient 생성
+→ Spring Bean으로 등록
+→ AwsCostExplorerService에 생성자 주입
+```
+
+이후 `AwsCostExplorerService`도 `@Service`를 통해 Bean으로 등록하고, `CostExplorerClient`를 직접 생성하지 않고 주입받아 사용한다.
+
+```java
+
+@Service
+public class AwsCostExplorerService {
+
+    private final CostExplorerClient costExplorerClient;
+
+    public AwsCostExplorerService(
+            CostExplorerClient costExplorerClient
+    ) {
+        this.costExplorerClient = costExplorerClient;
+    }
+}
+```
+
+이 구조를 사용하면 AWS Client의 생성과 설정은 Config가 담당하고, 실제 비용 조회는 Service가 담당하게 된다.
+
+```text
+Config
+→ 외부 객체 생성 및 설정
+
+Service
+→ AWS 비용 조회 로직
+```
+
+Bean으로 등록하는 주요 이유는 다음과 같다.
+
+* AWS Client를 여러 곳에서 새로 생성하지 않고 하나를 공유한다.
+* 리전 등의 설정을 한곳에서 관리한다.
+* Service가 객체 생성이 아닌 비용 조회 책임에 집중한다.
+* 생성자 주입을 사용할 수 있다.
+* 테스트에서 실제 Client를 Mock으로 교체하기 쉬워진다.
+* 애플리케이션 종료 시 Client의 생명주기를 Spring이 관리한다.
+
+AWS 자격 증명은 Config 코드에 직접 입력하지 않는다. AWS SDK의 기본 자격 증명 체인을 사용하므로 로컬에서는 AWS CLI 자격 증명을, 배포 환경에서는 EC2 또는 ECS의 IAM Role을 사용할 수 있다.
+
+Config를 등록하는 것만으로 실제 AWS API가 호출되지는 않는다.
+
+```text
+CostExplorerClient Bean 생성
+→ AWS 호출 객체만 준비
+
+getCostAndUsage() 실행
+→ 실제 Cost Explorer API 호출
+```
+
+따라서 기존 `./gradlew test`에서는 실제 비용 조회 메서드를 실행하지 않는 한 AWS API 요청이 발생하지 않는다.
