@@ -94,7 +94,7 @@ public class GlobalExceptionHandler {
 
     // GET 쿼리 파라미터의 형식 오류 처리
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMissmatch(
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException exception,
             HttpServletRequest request
     ) {

@@ -7,6 +7,7 @@ import com.cloudguard.cloudguard.cost.dto.MonthlyCostBreakdownResponse;
 import com.cloudguard.cloudguard.cost.dto.MonthlyCostResponse;
 import com.cloudguard.cloudguard.cost.dto.MonthlyServiceCostResponse;
 import com.cloudguard.cloudguard.cost.service.CostService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class CostController {
     }
 
     @PostMapping("/add-cost")
-    public CostRecord addServiceCost(@RequestBody CostCreateRequest request){
+    public CostRecord addServiceCost(@Valid @RequestBody CostCreateRequest request){
         return costService.addServiceCost(
                 request.getCloudService(),
                 request.getCost(),
