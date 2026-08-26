@@ -678,3 +678,7 @@ verifyNoInteractions(costService);
 `@ParameterizedTest`를 사용하면서 반복되는 MockMvc 검증 코드를 제거하고, 검증 사례를 추가할 때 `Arguments.of()`만 추가할 수 있게 됐다.
 
 추가로 `costs` 라고 오타가난걸 `cost`로 다시 수정했다.
+
+![img_14.png](img_14.png)
+
+자동 수집 구조 설계 전 ./gradlew test 진행

@@ -245,7 +245,7 @@ class CostControllerTest {
                                 {
                                     "cloudService" : "LAMBDA",
                                     "cost" : 1000,
-                                    "usageData" : "2026-08-26"
+                                    "usageDate" : "2026-08-26"
                                 }
                                 """
                 ),
