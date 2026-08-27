@@ -11,7 +11,7 @@ public class AwsCostExplorerConfig {
     @Bean
     public CostExplorerClient costExplorerClient() {
         return CostExplorerClient.builder()
-                .region(Region.AP_NORTHEAST_2)
+                .region(Region.US_EAST_1)
                 .build();
     }
 }
