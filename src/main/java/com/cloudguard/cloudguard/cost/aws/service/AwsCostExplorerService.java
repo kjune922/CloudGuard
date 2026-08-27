@@ -42,10 +42,10 @@ public class AwsCostExplorerService {
 
         GetCostAndUsageResponse response = costExplorerClient.getCostAndUsage(request);
 
-        return converToServiceCosts(response);
+        return convertToServiceCosts(response);
     }
 
-    private List<AwsServiceCost> converToServiceCosts(GetCostAndUsageResponse response) {
+    private List<AwsServiceCost> convertToServiceCosts(GetCostAndUsageResponse response) {
 
         List<AwsServiceCost> serviceCosts = new ArrayList<>();
 

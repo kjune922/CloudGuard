@@ -1060,3 +1060,10 @@ AwsCostExplorerService 구현
 - GetCostAndUsageRequest : 기간, 월 단위, 비용 종류, 그룹 조건을 하나의 요청으로 조립
 
 - costExplorerClient.getCostAndUsage(request) : 실제 AWS API 호출
+
+
+이후 AwsCostExplorerServiceTest 작성으로
+다음 2가지 검증을 진행해보았음
+1. 올바른 요청 객체를 AWS Client에 전달했는가?
+2. AWS 응답을 AwsServiceCost로 정확히 변환했는가?
+
