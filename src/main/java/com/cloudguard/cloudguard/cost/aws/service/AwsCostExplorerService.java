@@ -1,10 +1,14 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
+import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.costexplorer.CostExplorerClient;
 import software.amazon.awssdk.services.costexplorer.model.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AwsCostExplorerService {
@@ -15,7 +19,7 @@ public class AwsCostExplorerService {
         this.costExplorerClient = costExplorerClient;
     }
 
-    public GetCostAndUsageResponse getServiceCosts(
+    public List<AwsServiceCost> getServiceCosts(
             LocalDate startDate,
             LocalDate endDate
     ) {
@@ -36,6 +40,28 @@ public class AwsCostExplorerService {
                 .groupBy(groupDefinition)
                 .build();
 
-        return costExplorerClient.getCostAndUsage(request);
+        GetCostAndUsageResponse response = costExplorerClient.getCostAndUsage(request);
+
+        return converToServiceCosts(response);
+    }
+
+    private List<AwsServiceCost> converToServiceCosts(GetCostAndUsageResponse response) {
+
+        List<AwsServiceCost> serviceCosts = new ArrayList<>();
+
+        for (ResultByTime resultByTime : response.resultsByTime()) {
+            for (Group group : resultByTime.groups()) {
+                String serviceName = group.keys().get(0);
+
+                MetricValue metric = group.metrics().get("UnblendedCost");
+
+                BigDecimal amount = new BigDecimal(metric.amount());
+
+                String unit = metric.unit();
+
+                serviceCosts.add(new AwsServiceCost(serviceName, amount, unit));
+            }
+        }
+        return serviceCosts;
     }
 }

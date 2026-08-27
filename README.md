@@ -741,7 +741,7 @@ aws ce get-cost-and-usage \
   --granularity MONTHLY \
   --metrics UnblendedCost \
   --group-by Type=DIMENSION,Key=SERVICE \
-  --region ap-northeast-2
+  --region us-east-1
 ```
 
 `End` 날짜는 조회 범위에 포함되지 않는다. 따라서 `2026-08-27`을 지정하면 `2026-08-26`까지의 비용이 조회된다.
@@ -1048,3 +1048,15 @@ getCostAndUsage() 실행
 ```
 
 따라서 기존 `./gradlew test`에서는 실제 비용 조회 메서드를 실행하지 않는 한 AWS API 요청이 발생하지 않는다.
+
+# 2026-08-27
+
+AwsCostExplorerService 구현
+
+- DateInterval : 조회 기간 설정
+
+- GroupDefinition : SERVICE 기준 그룹화
+
+- GetCostAndUsageRequest : 기간, 월 단위, 비용 종류, 그룹 조건을 하나의 요청으로 조립
+
+- costExplorerClient.getCostAndUsage(request) : 실제 AWS API 호출
