@@ -749,12 +749,12 @@ aws ce get-cost-and-usage \
 주요 옵션의 의미는 다음과 같다.
 
 | 옵션                        | 의미                  |
-| ------------------------- | ------------------- |
+|---------------------------| ------------------- |
 | `--time-period`           | 비용을 조회할 기간          |
 | `--granularity MONTHLY`   | 월 단위 비용 조회          |
 | `--metrics UnblendedCost` | 할인 분배 전 실제 사용 비용 조회 |
 | `--group-by ... SERVICE`  | AWS 서비스별로 비용 분류     |
-| `--region ap-northeast-2` | API 요청에 사용할 리전      |
+| `--region us-east-1`      | API 요청에 사용할 리전      |
 
 실제 응답을 통해 다음 서비스들이 조회됐다.
 
