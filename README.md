@@ -1125,3 +1125,17 @@ new AwsServiceCost(
 그래서 외부 문자열과 내부 도메인을 연결해야하는 상황이다.
 Enum속에 있는 EC2, RDS, S3 를 제외한 서비스들을 OTHER 이라고 칭할 예정
 
+### AwsCostImportService
+
+- 이 서비스는 Mapper이후 AWS 비용을 조회하고, 서비스명을 CloudGuard가 조회할수있게
+- 변환한 뒤 기존 CostService를 통해 DB저장을 요청하는 Service
+
+AwsCostImportServiceTest 구현으로 검증해볼것들
+이 테스트는 다음 연결을 확인한다
+
+1. AWS 비용 목록을 받았는가?
+2. AWS 서비스명을 Mapper에 전달했는가?
+3. 변환된 S3와 비용을 CostService에 전달했는가?
+
+아직 실제 AWS나 DB는 사용하지 않음
+세 객체를 모두 Mock으로 만들고 AwsCostImportService의 흐름만 검증.
