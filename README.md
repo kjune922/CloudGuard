@@ -1099,3 +1099,29 @@ endDate가 8월 31일이면 실제 조회되는 구간은
 `List<AwsServiceCost>`이기 때문이다.
 
 - `$` 는 전체 배열, `$[0]`은 첫번째 비용 객체를 의미한다.
+
+Controller 테스트를 진행하며 체크할 부분들은 다음과 같다.
+- HTTP 날짜 파라미터를 정상적으로 받는가?
+- 파라미터가 LocalDate로 변환되는가?
+- Controller가 Service에 정확한 날짜를 전달하는가?
+- Service가 돌려준 List<AwsServiceCost>를 JSON 배열로 반환하는가?
+- JSON의 serviceName, amount, unit이 정확한가?
+
+### AWS 서비스명을 CloudGuard의 CloudService로 변환하는 Mapper 구현
+
+지금 현재 AWS 응답은
+```java
+new AwsServiceCost(
+    "Amazon Simple Storage Service",
+    new BigDecimal("0.0000000488"),
+    "USD"
+)
+```
+이렇게 옴
+
+하지만 내가 만든 CloudGuard 내부에서는 Enum 형식이
+`CloudService.S3` 임
+
+그래서 외부 문자열과 내부 도메인을 연결해야하는 상황이다.
+Enum속에 있는 EC2, RDS, S3 를 제외한 서비스들을 OTHER 이라고 칭할 예정
+
