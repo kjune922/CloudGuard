@@ -982,7 +982,7 @@ public class AwsCostExplorerConfig {
     @Bean
     public CostExplorerClient costExplorerClient() {
         return CostExplorerClient.builder()
-                .region(Region.AP_NORTHEAST_2)
+                .region(Region.US_EAST_1)
                 .build();
     }
 }
@@ -1067,3 +1067,22 @@ AwsCostExplorerService 구현
 1. 올바른 요청 객체를 AWS Client에 전달했는가?
 2. AWS 응답을 AwsServiceCost로 정확히 변환했는가?
 
+## 오늘의 핵심
+- CloudGuard가 AWS Cost Explorer의 원본 비용 데이터를 요청하기 위해,
+- 올바른 조회 조건을 가진 요청 객체를 만들고 AWS SDK Client에 전달했는지 확인한다.
+- AWS에 요청할 때는 AWS SDK 요청 모델을 사용하고 
+- 받은 AWS 원본 응답은 CloudGuard 내부 DTO와 도메인으로 변환하여 
+- 비용 저장,합산,예산 상태 계산에 사용한다.
+
+# 2026-08-29 - AWS 비용 조회 API 만들기
+
+지금까지 흐름은 AwsCostExplorerServcie -> AWS 요청 생성 -> CostExplorerClient 호출 -> AwsServiceCosts 반환이다
+하지만 아직 HTTP 요청으로 이 기능을 수행할 순 없음. 그래서 이번엔 Controller를 연결해서
+Postman으로 실제 조회할수 있게 만들어보자
+
+![img_16.png](img_16.png)
+
+ReqeustParma으로 startDate와 endDate를 조회해보았음
+참고로 startDate가 8월 1일이고
+endDate가 8월 31일이면 실제 조회되는 구간은
+8월 1일 ~ 8월 30일 까지이다.
