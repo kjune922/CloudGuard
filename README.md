@@ -1074,7 +1074,8 @@ AwsCostExplorerService 구현
 - 받은 AWS 원본 응답은 CloudGuard 내부 DTO와 도메인으로 변환하여 
 - 비용 저장,합산,예산 상태 계산에 사용한다.
 
-# 2026-08-29 - AWS 비용 조회 API 만들기
+# 2026-08-29
+### AWS 비용 조회 API 만들기
 
 지금까지 흐름은 AwsCostExplorerServcie -> AWS 요청 생성 -> CostExplorerClient 호출 -> AwsServiceCosts 반환이다
 하지만 아직 HTTP 요청으로 이 기능을 수행할 순 없음. 그래서 이번엔 Controller를 연결해서
@@ -1086,3 +1087,15 @@ ReqeustParma으로 startDate와 endDate를 조회해보았음
 참고로 startDate가 8월 1일이고
 endDate가 8월 31일이면 실제 조회되는 구간은
 8월 1일 ~ 8월 30일 까지이다.
+
+### Controller 테스트 진행
+
+방금 우린 AwsCostExplorerService -> AWS 요청 객체 생성 -> CostExplorerClient 호출 -> AWS 응답 변환
+의 사이클을 Postman으로 확인했다.
+이제는 Controller 테스트로 HTTP 요청 파라미터 -> LocalDate 변환 -> AwsCostExplorerService 호출 -> JSON 응답
+을 테스트로 확인해보자
+
+`$[0].serviceName` 를 쓰는데 여기서 `$[0]`을 쓰는 이유는 Controller 반환값이 객체 한개가아닌
+`List<AwsServiceCost>`이기 때문이다.
+
+- `$` 는 전체 배열, `$[0]`은 첫번째 비용 객체를 의미한다.
