@@ -1,7 +1,5 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
-
-import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.domain.CostSource;
@@ -164,7 +162,13 @@ public class AwsCostImportServiceIntegrationTest {
         Long manualId = manualRecord.getId();
         Long awsId = awsRecord.getId();
 
-        given(awsCostExplorerService.getDailyServiceCosts(startDate,endDate));
+        given(awsCostExplorerService.getDailyServiceCosts(startDate,endDate))
+                .willReturn(List.of(new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("12"),
+                        "USD",
+                        startDate
+                )));
 
         awsCostImportService.importCosts(startDate, endDate);
 
