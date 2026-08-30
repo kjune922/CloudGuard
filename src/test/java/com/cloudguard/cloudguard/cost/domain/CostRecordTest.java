@@ -20,6 +20,7 @@ public class CostRecordTest {
         assertThat(costRecord.getService()).isEqualTo(CloudService.EC2);
         assertThat(costRecord.getCost()).isEqualByComparingTo(new BigDecimal("25.50"));
         assertThat(costRecord.getUsageDate()).isEqualTo(LocalDate.of(2026,8,6));
+        assertThat(costRecord.getSource()).isEqualTo(CostSource.MANUAL);
     }
 
     @Test
