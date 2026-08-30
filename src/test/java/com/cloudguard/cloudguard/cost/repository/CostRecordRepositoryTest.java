@@ -2,6 +2,7 @@ package com.cloudguard.cloudguard.cost.repository;
 
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
+import com.cloudguard.cloudguard.cost.domain.CostSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -9,6 +10,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -110,5 +112,50 @@ class CostRecordRepositoryTest {
                 .isEqualByComparingTo(BigDecimal.valueOf(3000));
         assertThat(records.get(0).getUsageDate())
                 .isEqualTo(LocalDate.of(2027, 3, 1));
+    }
+
+    @Test
+    void 같은_서비스와_날짜에서도_AWS_출저의_기록만_조회 () {
+        LocalDate usageDate = LocalDate.of(2026,8,1);
+
+        CostRecord manualRecord = new CostRecord(CloudService.S3, new BigDecimal("100"), usageDate);
+
+        CostRecord awsRecord = new CostRecord(
+                CloudService.S3,
+                new BigDecimal("10.5"),
+                usageDate,
+                CostSource.AWS_COST_EXPLORER
+        );
+
+        costRecordRepository.save(manualRecord);
+        costRecordRepository.save(awsRecord);
+
+        CostRecord result = costRecordRepository.findByServiceAndUsageDateAndSource(
+                CloudService.S3,
+                usageDate,
+                CostSource.AWS_COST_EXPLORER
+        ).orElseThrow();
+
+        assertThat(result.getId()).isEqualTo(awsRecord.getId());
+        assertThat(result.getSource()).isEqualTo(awsRecord.getSource());
+        assertThat(result.getCost()).isEqualByComparingTo("10.5");
+    }
+
+    @Test
+    void 수동_기록만_있으면_AWS_기록_조회결과는_비어있음 () {
+        LocalDate usageDate = LocalDate.of(2026,8,1);
+
+        costRecordRepository.save(new CostRecord(
+                CloudService.S3,
+                new BigDecimal("100"),
+                usageDate
+        ));
+
+        Optional<CostRecord> result = costRecordRepository.findByServiceAndUsageDateAndSource(
+                CloudService.S3,
+                usageDate,
+                CostSource.AWS_COST_EXPLORER
+        );
+        assertThat(result).isEmpty();
     }
 }
