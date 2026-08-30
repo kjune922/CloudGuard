@@ -16,19 +16,24 @@ public class CostRecord {
     private CloudService service; // 사용한 서비스
     private BigDecimal cost; // 비용
     private LocalDate usageDate; // 비용발생일
+    private CostSource source;
 
     protected CostRecord() {
-
     }
 
+    public CostRecord(CloudService service, BigDecimal cost, LocalDate usageDate){
+        this(service,cost,usageDate, CostSource.MANUAL);
+    }
 
-    public CostRecord(CloudService service, BigDecimal cost, LocalDate usageDate) {
+    public CostRecord(CloudService service, BigDecimal cost, LocalDate usageDate, CostSource source) {
         validateService(service);
         validateCost(cost);
         validateUsageDate(usageDate);
+        validateSource(source);
         this.service = service;
         this.cost = cost;
         this.usageDate = usageDate;
+        this.source = source;
     }
 
     private void validateService(CloudService service) {
@@ -53,6 +58,16 @@ public class CostRecord {
         if(usageDate == null){
             throw new IllegalArgumentException("비용 발생일은 필수입니다.");
         }
+    }
+
+    private void validateSource(CostSource source){
+        if(source == null){
+            throw new IllegalArgumentException("비용 출저는 필수입니다.");
+        }
+    }
+
+    public CostSource getSource() {
+        return source;
     }
 
     public Long getId(){
