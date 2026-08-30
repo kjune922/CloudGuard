@@ -1,8 +1,8 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
-import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.aws.mapper.AwsServiceNameMapper;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
+import com.cloudguard.cloudguard.cost.dto.AwsDailyServiceCost;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,15 +37,16 @@ class AwsCostImportServiceTest {
         LocalDate startDate = LocalDate.of(2026,8,1);
         LocalDate endDate = LocalDate.of(2026,8,30);
 
-        AwsServiceCost awsServiceCost = new AwsServiceCost(
+        AwsDailyServiceCost awsServiceCost = new AwsDailyServiceCost(
                 "Amazon Simple Storage Service",
                 new BigDecimal("0.0000000488"),
-                "USD"
+                "USD",
+                startDate
         );
 
-        given(awsCostExplorerService.getServiceCosts(
+        given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,endDate
-        )).willReturn(List.of(awsServiceCost));
+        ));
 
         given(awsServiceNameMapper.toCloudService(
                 "Amazon Simple Storage Service"
@@ -66,19 +67,23 @@ class AwsCostImportServiceTest {
         LocalDate startDate = LocalDate.of(2026,8,1);
         LocalDate endDate = LocalDate.of(2026,8,31);
 
-        AwsServiceCost ec2Compute = new AwsServiceCost(
+        AwsDailyServiceCost ec2Compute = new AwsDailyServiceCost(
                 "Amazon Elastic Compute Cloud - Compute",
                 new BigDecimal("10"),
-                "USD");
+                "USD",
+                startDate
+        );
 
-        AwsServiceCost ec2Other = new AwsServiceCost(
+        AwsDailyServiceCost ec2Other = new AwsDailyServiceCost(
                 "EC2 - Other",
                 new BigDecimal("5"),
-                "USD");
+                "USD",
+                startDate
+        );
 
-        given(awsCostExplorerService.getServiceCosts(
+        given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,endDate
-        )).willReturn(List.of(ec2Compute,ec2Other));
+        ));
 
         given(awsServiceNameMapper.toCloudService(
                 "Amazon Elastic Compute Cloud - Compute"
@@ -93,6 +98,61 @@ class AwsCostImportServiceTest {
                 CloudService.EC2,
                 new BigDecimal("15"),
                 startDate
+        );
+
+        verifyNoMoreInteractions(costService);
+    }
+
+    @Test
+    void 같은_날짜의_서비스비용만_합산해서_저장함() {
+        LocalDate firstDate = LocalDate.of(2026,8,10);
+        LocalDate secondDate = LocalDate.of(2026,8,11);
+        LocalDate endDate = LocalDate.of(2026,8,12);
+
+        given(awsCostExplorerService.getDailyServiceCosts(
+                firstDate,
+                endDate
+        )).willReturn(List.of(
+                new AwsDailyServiceCost(
+                        "Amazon Elastic Compute Cloud - Compute",
+                        new BigDecimal("10"),
+                        "USD",
+                        firstDate
+                ),
+                new AwsDailyServiceCost(
+                        "EC2 - Other",
+                        new BigDecimal("5"),
+                        "USD",
+                        firstDate
+                ),
+                new AwsDailyServiceCost(
+                        "Amazon Elastic Compute Cloud - Compute",
+                        new BigDecimal("7"),
+                        "USD",
+                        secondDate
+                )
+        ));
+
+        given(awsServiceNameMapper.toCloudService(
+                "Amazon Elastic Compute Cloud - Compute"
+        )).willReturn(CloudService.EC2);
+
+        given(awsServiceNameMapper.toCloudService(
+                "EC2 - Other"
+        )).willReturn(CloudService.EC2);
+
+        awsCostImportService.importCosts(firstDate, endDate);
+
+        verify(costService).saveOrUpdateAwsCost(
+                CloudService.EC2,
+                new BigDecimal("15"),
+                firstDate
+        );
+
+        verify(costService).saveOrUpdateAwsCost(
+                CloudService.EC2,
+                new BigDecimal(7),
+                secondDate
         );
 
         verifyNoMoreInteractions(costService);

@@ -1,8 +1,8 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
-import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.aws.mapper.AwsServiceNameMapper;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
+import com.cloudguard.cloudguard.cost.dto.AwsDailyServiceCost;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Transactional
 @Service
@@ -28,21 +29,45 @@ public class AwsCostImportService {
     }
 
     public void importCosts(LocalDate startDate, LocalDate endDate){
-        List<AwsServiceCost> awsServiceCosts = awsCostExplorerService.getServiceCosts(
+        List<AwsDailyServiceCost> dailyServiceCosts = awsCostExplorerService.getDailyServiceCosts(
                 startDate,
                 endDate
         );
 
-        Map<CloudService, BigDecimal> serviceTotals = new EnumMap<>(CloudService.class);
+        // TreeMap을 쓴 이유는 날짜순서대로 할려고
+        Map<LocalDate, Map<CloudService, BigDecimal>> dailyTotals = new TreeMap<>();
 
-        // CloudService가 같은 Service끼리의 비용 합산
-        for (AwsServiceCost awsServiceCost : awsServiceCosts) {
-            CloudService cloudService = mapper.toCloudService(awsServiceCost.getServiceName());
+        // 날짜별 - 서비스별 합산
+        for (AwsDailyServiceCost dailyCost : dailyServiceCosts) {
 
-            serviceTotals.merge(cloudService, awsServiceCost.getAmount(), BigDecimal::add);
+            LocalDate usageDate = dailyCost.getUsageDate();
+
+            CloudService cloudService = mapper.toCloudService(dailyCost.getServiceName());
+
+            Map<CloudService, BigDecimal> serviceTotals = dailyTotals.computeIfAbsent(
+                    usageDate,
+                    date -> new EnumMap<>(CloudService.class)
+            );
+
+            serviceTotals.merge(
+                    cloudService,
+                    dailyCost.getAmount(),
+                    BigDecimal::add
+            );
         }
-        for (Map.Entry<CloudService, BigDecimal> entry : serviceTotals.entrySet()) {
-            costService.saveOrUpdateAwsCost(entry.getKey(), entry.getValue(), startDate);
+
+        // 합산 결과를 해당 날짜로 저장 하고 갱신함
+        for (Map.Entry<LocalDate, Map<CloudService, BigDecimal>> dailyEntry : dailyTotals.entrySet()) {
+            LocalDate usageDate = dailyEntry.getKey();
+
+            for (Map.Entry<CloudService, BigDecimal> serviceEntry : dailyEntry.getValue().entrySet()) {
+
+                costService.saveOrUpdateAwsCost(
+                        serviceEntry.getKey(),
+                        serviceEntry.getValue(),
+                        usageDate
+                );
+            }
         }
     }
 }

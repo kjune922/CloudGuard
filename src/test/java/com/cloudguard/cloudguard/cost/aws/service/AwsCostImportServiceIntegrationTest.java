@@ -5,6 +5,7 @@ import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.domain.CostSource;
+import com.cloudguard.cloudguard.cost.dto.AwsDailyServiceCost;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -87,22 +88,24 @@ public class AwsCostImportServiceIntegrationTest {
         LocalDate startDate = LocalDate.of(2026,8,1);
         LocalDate endDate = LocalDate.of(2026,8,31);
 
-        AwsServiceCost firstCost = new AwsServiceCost(
+        AwsDailyServiceCost firstCost = new AwsDailyServiceCost(
                 "Amazon Simple Storage Service",
                 new BigDecimal("10.5"),
-                "USD"
+                "USD",
+                startDate
         );
 
-        AwsServiceCost updatedCost = new AwsServiceCost(
+        AwsDailyServiceCost updatedCost = new AwsDailyServiceCost(
                 "Amazon Simple Storage Service",
                 new BigDecimal("12"),
-                "USD"
+                "USD",
+                startDate
         );
 
-        given(awsCostExplorerService.getServiceCosts(
+        given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,
                 endDate
-        )).willReturn(List.of(firstCost),List.of(updatedCost));
+        ));
 
         // 첫번째 수집 - 10.5 저장함
         awsCostImportService.importCosts(startDate,endDate);
@@ -159,12 +162,7 @@ public class AwsCostImportServiceIntegrationTest {
         Long manualId = manualRecord.getId();
         Long awsId = awsRecord.getId();
 
-        given(awsCostExplorerService.getServiceCosts(startDate,endDate))
-                .willReturn(List.of(new AwsServiceCost(
-                        "Amazon Simple Storage Service",
-                        new BigDecimal("12"),
-                        "USD"
-                )));
+        given(awsCostExplorerService.getDailyServiceCosts(startDate,endDate));
 
         awsCostImportService.importCosts(startDate, endDate);
 
