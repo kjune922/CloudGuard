@@ -42,11 +42,12 @@ public class AwsCostImportServiceIntegrationTest {
         LocalDate startDate = LocalDate.of(2026,8,1);
         LocalDate endDate = LocalDate.of(2026,8,31);
 
-        given(awsCostExplorerService.getServiceCosts(startDate,endDate))
-                .willReturn(List.of(new AwsServiceCost(
+        given(awsCostExplorerService.getDailyServiceCosts(startDate,endDate))
+                .willReturn(List.of(new AwsDailyServiceCost(
                         "Amazon Simple Storage Service",
                         new BigDecimal("10.5"),
-                        "USD"
+                        "USD",
+                        startDate
                 )));
 
         awsCostImportService.importCosts(startDate,endDate);
@@ -64,11 +65,12 @@ public class AwsCostImportServiceIntegrationTest {
         LocalDate startDate = LocalDate.of(2026,8,1);
         LocalDate endDate = LocalDate.of(2026,8,31);
 
-        given(awsCostExplorerService.getServiceCosts(startDate,endDate))
-                .willReturn(List.of(new AwsServiceCost(
+        given(awsCostExplorerService.getDailyServiceCosts(startDate,endDate))
+                .willReturn(List.of(new AwsDailyServiceCost(
                         "Amazon Simple Storage Service",
                         new BigDecimal("10.5"),
-                        "USD"
+                        "USD",
+                        startDate
                 )));
 
         awsCostImportService.importCosts(startDate,endDate);
@@ -105,7 +107,7 @@ public class AwsCostImportServiceIntegrationTest {
         given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,
                 endDate
-        ));
+        )).willReturn(List.of(firstCost), List.of(updatedCost));
 
         // 첫번째 수집 - 10.5 저장함
         awsCostImportService.importCosts(startDate,endDate);

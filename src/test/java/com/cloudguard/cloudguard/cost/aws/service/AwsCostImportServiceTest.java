@@ -46,7 +46,7 @@ class AwsCostImportServiceTest {
 
         given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,endDate
-        ));
+        )).willReturn(List.of(awsServiceCost));
 
         given(awsServiceNameMapper.toCloudService(
                 "Amazon Simple Storage Service"
@@ -54,7 +54,7 @@ class AwsCostImportServiceTest {
 
         awsCostImportService.importCosts(startDate,endDate);
 
-        verify(awsCostExplorerService).getServiceCosts(startDate,endDate);
+        verify(awsCostExplorerService).getDailyServiceCosts(startDate,endDate);
         verify(awsServiceNameMapper).toCloudService("Amazon Simple Storage Service");
         verify(costService).saveOrUpdateAwsCost(
                 CloudService.S3,
@@ -83,7 +83,7 @@ class AwsCostImportServiceTest {
 
         given(awsCostExplorerService.getDailyServiceCosts(
                 startDate,endDate
-        ));
+        )).willReturn(List.of(ec2Compute,ec2Other));
 
         given(awsServiceNameMapper.toCloudService(
                 "Amazon Elastic Compute Cloud - Compute"
