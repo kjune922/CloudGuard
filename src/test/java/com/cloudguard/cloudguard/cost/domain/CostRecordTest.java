@@ -65,6 +65,6 @@ public class CostRecordTest {
                 LocalDate.of(2026,8,1),
                 null
         )).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("비용 출처는 필수입니다.");
+                .hasMessage("비용 출저는 필수입니다.");
     }
 }

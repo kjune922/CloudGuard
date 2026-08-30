@@ -55,7 +55,7 @@ class AwsCostImportServiceTest {
 
         verify(awsCostExplorerService).getServiceCosts(startDate,endDate);
         verify(awsServiceNameMapper).toCloudService("Amazon Simple Storage Service");
-        verify(costService).addServiceCost(
+        verify(costService).saveOrUpdateAwsCost(
                 CloudService.S3,
                 new BigDecimal("0.0000000488"),
                 startDate);
@@ -89,7 +89,7 @@ class AwsCostImportServiceTest {
 
         awsCostImportService.importCosts(startDate,endDate);
 
-        verify(costService).addServiceCost(
+        verify(costService).saveOrUpdateAwsCost(
                 CloudService.EC2,
                 new BigDecimal("15"),
                 startDate

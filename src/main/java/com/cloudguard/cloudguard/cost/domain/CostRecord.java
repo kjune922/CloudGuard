@@ -37,6 +37,11 @@ public class CostRecord {
         this.source = source;
     }
 
+    public void updateCost(BigDecimal cost){
+        validateCost(cost);
+        this.cost = cost;
+    }
+
     private void validateService(CloudService service) {
 
         if(service == null){

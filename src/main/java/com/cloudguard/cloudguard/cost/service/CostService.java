@@ -2,15 +2,19 @@ package com.cloudguard.cloudguard.cost.service;
 
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
+import com.cloudguard.cloudguard.cost.domain.CostSource;
 import com.cloudguard.cloudguard.cost.domain.MonthlyCost;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class CostService {
@@ -83,6 +87,31 @@ public class CostService {
         MonthlyCost monthlyCost = new MonthlyCost(records);
 
         return monthlyCost.calculateTotalsByService(yearMonth);
+    }
+
+    // AWS 전용 저장,갱신 메소드
+    @Transactional
+    public CostRecord saveOrUpdateAwsCost(CloudService service, BigDecimal cost, LocalDate usageDate) {
+        Optional<CostRecord> existingRecord = costRecordRepository.findByServiceAndUsageDateAndSource(
+                service,
+                usageDate,
+                CostSource.AWS_COST_EXPLORER
+        );
+
+        if(existingRecord.isPresent()) {
+            CostRecord costRecord = existingRecord.get();
+            costRecord.updateCost(cost);
+            return costRecord;
+        }
+
+        CostRecord costRecord = new CostRecord(
+                service,
+                cost,
+                usageDate,
+                CostSource.AWS_COST_EXPLORER
+        );
+
+        return costRecordRepository.save(costRecord);
     }
 
 }

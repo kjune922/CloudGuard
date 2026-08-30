@@ -4,6 +4,7 @@ package com.cloudguard.cloudguard.cost.aws.service;
 import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
+import com.cloudguard.cloudguard.cost.domain.CostSource;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(records.get(0).getService()).isEqualTo(CloudService.S3);
         assertThat(records.get(0).getCost()).isEqualByComparingTo("10.5");
         assertThat(records.get(0).getUsageDate()).isEqualTo(startDate);
+        assertThat(records.get(0).getSource()).isEqualTo(CostSource.AWS_COST_EXPLORER);
     }
 
     @Test
@@ -73,5 +75,6 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(records.get(0).getService()).isEqualTo(CloudService.S3);
         assertThat(records.get(0).getCost()).isEqualByComparingTo("10.5");
         assertThat(records.get(0).getUsageDate()).isEqualTo(startDate);
+        assertThat(records.get(0).getSource()).isEqualTo(CostSource.AWS_COST_EXPLORER);
     }
 }

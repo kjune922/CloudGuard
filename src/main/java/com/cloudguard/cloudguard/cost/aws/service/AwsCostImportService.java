@@ -42,7 +42,7 @@ public class AwsCostImportService {
             serviceTotals.merge(cloudService, awsServiceCost.getAmount(), BigDecimal::add);
         }
         for (Map.Entry<CloudService, BigDecimal> entry : serviceTotals.entrySet()) {
-            costService.addServiceCost(entry.getKey(), entry.getValue(), startDate);
+            costService.saveOrUpdateAwsCost(entry.getKey(), entry.getValue(), startDate);
         }
     }
 }
