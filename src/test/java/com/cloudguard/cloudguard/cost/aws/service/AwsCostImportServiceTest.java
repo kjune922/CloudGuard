@@ -80,7 +80,11 @@ class AwsCostImportServiceTest {
                 startDate,endDate
         )).willReturn(List.of(ec2Compute,ec2Other));
 
-        given(awsServiceNameMapper.toCloudService("EC - Other"))
+        given(awsServiceNameMapper.toCloudService(
+                "Amazon Elastic Compute Cloud - Compute"
+        )).willReturn(CloudService.EC2);
+
+        given(awsServiceNameMapper.toCloudService("EC2 - Other"))
                 .willReturn(CloudService.EC2);
 
         awsCostImportService.importCosts(startDate,endDate);
