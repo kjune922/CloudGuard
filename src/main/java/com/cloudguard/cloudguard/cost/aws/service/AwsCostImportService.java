@@ -5,10 +5,12 @@ import com.cloudguard.cloudguard.cost.aws.mapper.AwsServiceNameMapper;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Transactional
 @Service
 public class AwsCostImportService {
 
@@ -27,6 +29,7 @@ public class AwsCostImportService {
                 startDate,
                 endDate
         );
+
 
         for (AwsServiceCost awsServiceCost : awsServiceCosts) {
             CloudService cloudService = mapper.toCloudService(awsServiceCost.getServiceName());

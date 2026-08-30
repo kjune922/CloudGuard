@@ -1139,3 +1139,8 @@ AwsCostImportServiceTest 구현으로 검증해볼것들
 
 아직 실제 AWS나 DB는 사용하지 않음
 세 객체를 모두 Mock으로 만들고 AwsCostImportService의 흐름만 검증.
+
+# 2026-08-30
+
+AWS 비용을 CloudGuard의 실제 저장 계층까지 연결되었는지 확인하기위해
+AwsCostImportServiceIntegrationTest 테스트 구현
