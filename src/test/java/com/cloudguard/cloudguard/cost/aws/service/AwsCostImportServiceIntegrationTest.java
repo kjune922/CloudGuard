@@ -133,4 +133,59 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(result.getUsageDate()).isEqualTo(startDate);
         assertThat(result.getSource()).isEqualTo(CostSource.AWS_COST_EXPLORER);
     }
+
+    @Test
+    void AWS_비용을_갱신해도_수동등록_비용유지() {
+        LocalDate startDate = LocalDate.of(2026,8,1);
+        LocalDate endDate = LocalDate.of(2026,8,31);
+
+        CostRecord manualRecord = costRecordRepository.save(
+                new CostRecord(
+                        CloudService.S3,
+                        new BigDecimal("100"),
+                        startDate
+                )
+        );
+
+        CostRecord awsRecord = costRecordRepository.save(
+                new CostRecord(
+                        CloudService.S3,
+                        new BigDecimal("10.5"),
+                        startDate,
+                        CostSource.AWS_COST_EXPLORER
+                )
+        );
+
+        Long manualId = manualRecord.getId();
+        Long awsId = awsRecord.getId();
+
+        given(awsCostExplorerService.getServiceCosts(startDate,endDate))
+                .willReturn(List.of(new AwsServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("12"),
+                        "USD"
+                )));
+
+        awsCostImportService.importCosts(startDate, endDate);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<CostRecord> records = costRecordRepository.findByUsageDateBetween(
+                startDate,endDate
+        );
+
+        assertThat(records).hasSize(2);
+
+        CostRecord manualResult = costRecordRepository.findById(manualId).orElseThrow();
+
+        CostRecord awsResult = costRecordRepository.findById(awsId).orElseThrow();
+
+        assertThat(manualResult.getSource()).isEqualTo(CostSource.MANUAL);
+        assertThat(manualResult.getCost()).isEqualByComparingTo("100");
+
+        assertThat(awsResult.getSource()).isEqualTo(CostSource.AWS_COST_EXPLORER);
+        assertThat(awsResult.getCost()).isEqualByComparingTo("12");
+
+    }
 }
