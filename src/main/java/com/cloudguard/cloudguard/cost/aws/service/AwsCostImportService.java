@@ -7,8 +7,11 @@ import com.cloudguard.cloudguard.cost.service.CostService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Service
@@ -30,11 +33,16 @@ public class AwsCostImportService {
                 endDate
         );
 
+        Map<CloudService, BigDecimal> serviceTotals = new EnumMap<>(CloudService.class);
 
+        // CloudService가 같은 Service끼리의 비용 합산
         for (AwsServiceCost awsServiceCost : awsServiceCosts) {
             CloudService cloudService = mapper.toCloudService(awsServiceCost.getServiceName());
 
-            costService.addServiceCost(cloudService, awsServiceCost.getAmount(), startDate);
+            serviceTotals.merge(cloudService, awsServiceCost.getAmount(), BigDecimal::add);
+        }
+        for (Map.Entry<CloudService, BigDecimal> entry : serviceTotals.entrySet()) {
+            costService.addServiceCost(entry.getKey(), entry.getValue(), startDate);
         }
     }
 }

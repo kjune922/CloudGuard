@@ -12,8 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class AwsCostImportServiceTest {
 
@@ -60,6 +59,39 @@ class AwsCostImportServiceTest {
                 CloudService.S3,
                 new BigDecimal("0.0000000488"),
                 startDate);
+    }
+
+    @Test
+    void 같은_CloudService로_변환되는_AWS_비용은_합산해서_저장 () {
+        LocalDate startDate = LocalDate.of(2026,8,1);
+        LocalDate endDate = LocalDate.of(2026,8,31);
+
+        AwsServiceCost ec2Compute = new AwsServiceCost(
+                "Amazon Elastic Compute Cloud - Compute",
+                new BigDecimal("10"),
+                "USD");
+
+        AwsServiceCost ec2Other = new AwsServiceCost(
+                "EC2 - Other",
+                new BigDecimal("5"),
+                "USD");
+
+        given(awsCostExplorerService.getServiceCosts(
+                startDate,endDate
+        )).willReturn(List.of(ec2Compute,ec2Other));
+
+        given(awsServiceNameMapper.toCloudService("EC - Other"))
+                .willReturn(CloudService.EC2);
+
+        awsCostImportService.importCosts(startDate,endDate);
+
+        verify(costService).addServiceCost(
+                CloudService.EC2,
+                new BigDecimal("15"),
+                startDate
+        );
+
+        verifyNoMoreInteractions(costService);
     }
 
 }
