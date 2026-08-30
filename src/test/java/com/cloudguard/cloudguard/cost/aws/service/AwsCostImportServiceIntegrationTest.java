@@ -51,4 +51,27 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(records.get(0).getCost()).isEqualByComparingTo("10.5");
         assertThat(records.get(0).getUsageDate()).isEqualTo(startDate);
     }
+
+    @Test
+    void 같은_기간을_두번_저장해도_비용은_중복되지않음 () {
+        LocalDate startDate = LocalDate.of(2026,8,1);
+        LocalDate endDate = LocalDate.of(2026,8,31);
+
+        given(awsCostExplorerService.getServiceCosts(startDate,endDate))
+                .willReturn(List.of(new AwsServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("10.5"),
+                        "USD"
+                )));
+
+        awsCostImportService.importCosts(startDate,endDate);
+        awsCostImportService.importCosts(startDate,endDate);
+
+        List<CostRecord> records = costRecordRepository.findByUsageDateBetween(startDate,endDate);
+
+        assertThat(records).hasSize(1);
+        assertThat(records.get(0).getService()).isEqualTo(CloudService.S3);
+        assertThat(records.get(0).getCost()).isEqualByComparingTo("10.5");
+        assertThat(records.get(0).getUsageDate()).isEqualTo(startDate);
+    }
 }
