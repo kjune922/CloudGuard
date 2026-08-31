@@ -18,7 +18,7 @@ public class MonthlyBudget {
 
 
     @Convert(converter = YearMonthConverter.class)
-    @Column(name = "year_month",nullable = false,unique = true,length = 7)
+    @Column(name = "budget_month",nullable = false,unique = true,length = 7)
     private YearMonth yearMonth;
 
     @Column(name = "monthly_limit",nullable = false)
