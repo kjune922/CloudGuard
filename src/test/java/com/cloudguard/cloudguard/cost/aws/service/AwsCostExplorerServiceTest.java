@@ -4,6 +4,8 @@ import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
 import com.cloudguard.cloudguard.cost.dto.AwsDailyServiceCost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.costexplorer.CostExplorerClient;
 import software.amazon.awssdk.services.costexplorer.model.*;
@@ -13,11 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 class AwsCostExplorerServiceTest {
 
@@ -276,7 +277,7 @@ class AwsCostExplorerServiceTest {
                 any(GetCostAndUsageRequest.class)
         )).willReturn(firstPage,lastPage);
 
-        List<AwsDailyServiceCost> result = awsCostExplorerService.getDailyServiceCosts(
+        List<AwsServiceCost> result = awsCostExplorerService.getServiceCosts(
                 LocalDate.of(2026,7,1),
                 LocalDate.of(2026,9,1)
         );
@@ -311,5 +312,53 @@ class AwsCostExplorerServiceTest {
                 .isEqualTo(firstRequest.metrics());
         assertThat(secondRequest.groupBy())
                 .isEqualTo(firstRequest.groupBy());
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "null, 2026-08-12",
+                    "2026-08-10, null",
+                    "null, null",
+                    "2026-08-10, 2026-08-10",
+                    "2026-08-12, 2026-08-10"
+            },
+            nullValues = "null"
+    )
+    void 잘못된_기간이면_일별조회시_AWS를_호출하지_않는다(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        assertThatThrownBy(() ->
+                awsCostExplorerService.getDailyServiceCosts(
+                        startDate, endDate
+                )
+        ).isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(costExplorerClient);
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "null, 2026-08-12",
+                    "2026-08-10, null",
+                    "null, null",
+                    "2026-08-10, 2026-08-10",
+                    "2026-08-12, 2026-08-10"
+            },
+            nullValues = "null"
+    )
+    void 잘못된_기간이면_월별조회시_AWS를_호출하지_않는다(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        assertThatThrownBy(() ->
+                awsCostExplorerService.getServiceCosts(
+                        startDate, endDate
+                )
+        ).isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(costExplorerClient);
     }
 }
