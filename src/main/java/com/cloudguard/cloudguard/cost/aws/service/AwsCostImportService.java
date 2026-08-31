@@ -40,6 +40,7 @@ public class AwsCostImportService {
         // 날짜별 - 서비스별 합산
         for (AwsDailyServiceCost dailyCost : dailyServiceCosts) {
 
+            validateCurrency(dailyCost.getUnit());
             LocalDate usageDate = dailyCost.getUsageDate();
 
             CloudService cloudService = mapper.toCloudService(dailyCost.getServiceName());
@@ -68,6 +69,13 @@ public class AwsCostImportService {
                         usageDate
                 );
             }
+        }
+    }
+    private void validateCurrency(String unit) {
+        if (!"USD".equals(unit)) {
+            throw new IllegalStateException(
+                    "지원하지 않는 AWS 비용 통화입니다: " + unit
+            );
         }
     }
 }

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -156,6 +157,41 @@ class AwsCostImportServiceTest {
         );
 
         verifyNoMoreInteractions(costService);
+    }
+
+    @Test
+    void USD가_아닌_비용이_섞이면_아무것도_저장하지_않는다() {
+        LocalDate startDate = LocalDate.of(2026, 8, 10);
+        LocalDate endDate = LocalDate.of(2026, 8, 11);
+
+        given(awsCostExplorerService.getDailyServiceCosts(
+                startDate, endDate
+        )).willReturn(List.of(
+                new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("10"),
+                        "USD",
+                        startDate
+                ),
+                new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("1000"),
+                        "KRW",
+                        startDate
+                )
+        ));
+
+        given(awsServiceNameMapper.toCloudService(
+                "Amazon Simple Storage Service"
+        )).willReturn(CloudService.S3);
+
+        assertThatThrownBy(() ->
+                awsCostImportService.importCosts(startDate, endDate)
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("지원하지 않는 AWS 비용 통화입니다: KRW");
+
+        verifyNoInteractions(costService);
     }
 
 }
