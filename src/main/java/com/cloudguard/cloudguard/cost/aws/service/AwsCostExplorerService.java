@@ -23,6 +23,9 @@ public class AwsCostExplorerService {
     // 일별 비용 조회
     public List<AwsDailyServiceCost> getDailyServiceCosts(
             LocalDate startDate, LocalDate endDate) {
+
+        validatePeriod(startDate,endDate);
+
         DateInterval dateInterval = DateInterval.builder()
                 .start(startDate.toString())
                 .end(endDate.toString())
@@ -71,6 +74,8 @@ public class AwsCostExplorerService {
             LocalDate startDate,
             LocalDate endDate
     ) {
+        validatePeriod(startDate,endDate);
+
         DateInterval dateInterval = DateInterval.builder()
                 .start(startDate.toString())
                 .end(endDate.toString())
@@ -154,5 +159,15 @@ public class AwsCostExplorerService {
             }
         }
         return serviceCosts;
+    }
+
+    private void validatePeriod(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null){
+            throw  new IllegalArgumentException("시작과 종료일은 필수입니다.");
+        }
+
+        if(!startDate.isBefore(endDate)){
+            throw new IllegalArgumentException("시작일은 종료일보다 빨라야 합니다.");
+        }
     }
 }
