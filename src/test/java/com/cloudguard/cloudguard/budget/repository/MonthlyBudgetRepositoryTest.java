@@ -4,6 +4,7 @@ import com.cloudguard.cloudguard.budget.domain.MonthlyBudget;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -11,6 +12,7 @@ import java.time.YearMonth;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class MonthlyBudgetRepositoryTest {
 
     @Autowired
