@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 class AwsCostExplorerServiceTest {
 
@@ -171,5 +172,78 @@ class AwsCostExplorerServiceTest {
                 .isEqualTo("2026-08-10");
         assertThat(request.timePeriod().end())
                 .isEqualTo("2026-08-12");
+    }
+
+    @Test
+    void 다음_페이지가_있으면_모든_페이지_일별비용_조회 () {
+        GetCostAndUsageResponse firstPage =
+                GetCostAndUsageResponse.builder()
+                        .resultsByTime(
+                                createDailyResult(
+                                        "2026-08-10",
+                                        "2026-08-11",
+                                        "3"
+                                )
+                        )
+                        .nextPageToken("next-page-token")
+                        .build();
+
+        GetCostAndUsageResponse lastPage =
+                GetCostAndUsageResponse.builder()
+                        .resultsByTime(
+                                createDailyResult(
+                                        "2026-08-11",
+                                        "2026-08-12",
+                                        "5"
+                                )
+                        )
+                        .build();
+
+        given(costExplorerClient.getCostAndUsage(
+                any(GetCostAndUsageRequest.class)
+        )).willReturn(firstPage,lastPage);
+
+        List<AwsDailyServiceCost> result = awsCostExplorerService.getDailyServiceCosts(
+                LocalDate.of(2026,8,10),
+                LocalDate.of(2026,8,12)
+        );
+
+        // 두 페이지 결과 모두 포함
+        assertThat(result).hasSize(2);
+
+        assertThat(result).extracting(AwsDailyServiceCost::getUsageDate)
+                .containsExactly(
+                        LocalDate.of(2026,8,10),
+                        LocalDate.of(2026,8,11)
+                );
+
+        assertThat(result.get(0).getAmount()).isEqualByComparingTo("3");
+        assertThat(result.get(1).getAmount()).isEqualByComparingTo("5");
+
+        ArgumentCaptor<GetCostAndUsageRequest> captor =
+                ArgumentCaptor.forClass(GetCostAndUsageRequest.class);
+
+        verify(costExplorerClient, times(2))
+                .getCostAndUsage(captor.capture());
+
+        List<GetCostAndUsageRequest> requests =
+                captor.getAllValues();
+
+        GetCostAndUsageRequest firstRequest = requests.get(0);
+        GetCostAndUsageRequest secondRequest = requests.get(1);
+
+        assertThat(firstRequest.nextPageToken()).isNull();
+        assertThat(secondRequest.nextPageToken())
+                .isEqualTo("next-page-token");
+
+        // 다음 페이지에서도 조회 조건은 유지하도록
+        assertThat(secondRequest.timePeriod())
+                .isEqualTo(firstRequest.timePeriod());
+        assertThat(secondRequest.granularity())
+                .isEqualTo(Granularity.DAILY);
+        assertThat(secondRequest.metrics())
+                .isEqualTo(firstRequest.metrics());
+        assertThat(secondRequest.groupBy())
+                .isEqualTo(firstRequest.groupBy());
     }
 }

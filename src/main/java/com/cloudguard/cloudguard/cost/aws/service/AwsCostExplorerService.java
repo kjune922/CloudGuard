@@ -40,9 +40,31 @@ public class AwsCostExplorerService {
                 .groupBy(groupDefinition)
                 .build();
 
-        GetCostAndUsageResponse response = costExplorerClient.getCostAndUsage(request);
+        List<AwsDailyServiceCost> allServiceCosts = new ArrayList<>();
 
-        return convertToDailyServiceCosts(response);
+        while (true) {
+            GetCostAndUsageResponse response =
+                    costExplorerClient.getCostAndUsage(request);
+
+            // 현재 페이지 결과를 누적
+            allServiceCosts.addAll(
+                    convertToDailyServiceCosts(response)
+            );
+
+            String nextPageToken = response.nextPageToken();
+
+            // 다음 페이지가 없으면 종료
+            if (nextPageToken == null || nextPageToken.isBlank()) {
+                break;
+            }
+
+            // 기존 조회 조건을 유지하고 다음 페이지 토큰만 설정
+            request = request.toBuilder()
+                    .nextPageToken(nextPageToken)
+                    .build();
+        }
+
+        return allServiceCosts;
     }
 
     public List<AwsServiceCost> getServiceCosts(
