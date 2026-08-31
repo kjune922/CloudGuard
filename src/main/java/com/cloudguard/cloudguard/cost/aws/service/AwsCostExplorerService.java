@@ -88,9 +88,26 @@ public class AwsCostExplorerService {
                 .groupBy(groupDefinition)
                 .build();
 
-        GetCostAndUsageResponse response = costExplorerClient.getCostAndUsage(request);
+        List<AwsServiceCost> allServiceCosts = new ArrayList<>();
 
-        return convertToServiceCosts(response);
+        while (true) {
+            GetCostAndUsageResponse response =
+                    costExplorerClient.getCostAndUsage(request);
+
+            allServiceCosts.addAll(convertToServiceCosts(response));
+
+            String nextPageToken = response.nextPageToken();
+
+            if (nextPageToken == null || nextPageToken.isBlank()) {
+                break;
+            }
+
+            request = request.toBuilder()
+                    .nextPageToken(nextPageToken)
+                    .build();
+        }
+
+        return allServiceCosts;
     }
 
     private List<AwsServiceCost> convertToServiceCosts(GetCostAndUsageResponse response) {

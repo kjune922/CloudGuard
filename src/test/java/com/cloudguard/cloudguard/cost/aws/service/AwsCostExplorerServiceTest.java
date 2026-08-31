@@ -31,7 +31,7 @@ class AwsCostExplorerServiceTest {
                 new AwsCostExplorerService(costExplorerClient);
     }
 
-    private ResultByTime createDailyResult(
+    private ResultByTime createResultByTime(
             String startDate,
             String endDate,
             String amount
@@ -118,12 +118,12 @@ class AwsCostExplorerServiceTest {
     void AWS_일별_비용을_날짜와_함께_DTO로_변환 () {
         GetCostAndUsageResponse response = GetCostAndUsageResponse.builder()
                 .resultsByTime(
-                        createDailyResult(
+                        createResultByTime(
                                 "2026-08-10",
                                 "2026-08-11",
                                 "3"
                         ),
-                        createDailyResult(
+                        createResultByTime(
                                 "2026-08-11",
                                 "2026-08-12",
                                 "5"
@@ -179,7 +179,7 @@ class AwsCostExplorerServiceTest {
         GetCostAndUsageResponse firstPage =
                 GetCostAndUsageResponse.builder()
                         .resultsByTime(
-                                createDailyResult(
+                                createResultByTime(
                                         "2026-08-10",
                                         "2026-08-11",
                                         "3"
@@ -191,7 +191,7 @@ class AwsCostExplorerServiceTest {
         GetCostAndUsageResponse lastPage =
                 GetCostAndUsageResponse.builder()
                         .resultsByTime(
-                                createDailyResult(
+                                createResultByTime(
                                         "2026-08-11",
                                         "2026-08-12",
                                         "5"
@@ -241,6 +241,72 @@ class AwsCostExplorerServiceTest {
                 .isEqualTo(firstRequest.timePeriod());
         assertThat(secondRequest.granularity())
                 .isEqualTo(Granularity.DAILY);
+        assertThat(secondRequest.metrics())
+                .isEqualTo(firstRequest.metrics());
+        assertThat(secondRequest.groupBy())
+                .isEqualTo(firstRequest.groupBy());
+    }
+
+    @Test
+    void 다음_페이지가_있으면_모든_페이지_월별비용_조회 () {
+        GetCostAndUsageResponse firstPage =
+                GetCostAndUsageResponse.builder()
+                        .resultsByTime(
+                                createResultByTime(
+                                        "2026-07-01",
+                                        "2026-08-01",
+                                        "3"
+                                )
+                        )
+                        .nextPageToken("next-page-token")
+                        .build();
+
+        GetCostAndUsageResponse lastPage =
+                GetCostAndUsageResponse.builder()
+                        .resultsByTime(
+                                createResultByTime(
+                                        "2026-08-01",
+                                        "2026-09-01",
+                                        "5"
+                                )
+                        )
+                        .build();
+
+        given(costExplorerClient.getCostAndUsage(
+                any(GetCostAndUsageRequest.class)
+        )).willReturn(firstPage,lastPage);
+
+        List<AwsDailyServiceCost> result = awsCostExplorerService.getDailyServiceCosts(
+                LocalDate.of(2026,7,1),
+                LocalDate.of(2026,9,1)
+        );
+
+        // 두 페이지 결과 모두 포함
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getAmount()).isEqualByComparingTo("3");
+        assertThat(result.get(1).getAmount()).isEqualByComparingTo("5");
+
+        ArgumentCaptor<GetCostAndUsageRequest> captor =
+                ArgumentCaptor.forClass(GetCostAndUsageRequest.class);
+
+        verify(costExplorerClient, times(2))
+                .getCostAndUsage(captor.capture());
+
+        List<GetCostAndUsageRequest> requests =
+                captor.getAllValues();
+
+        GetCostAndUsageRequest firstRequest = requests.get(0);
+        GetCostAndUsageRequest secondRequest = requests.get(1);
+
+        assertThat(firstRequest.nextPageToken()).isNull();
+        assertThat(secondRequest.nextPageToken())
+                .isEqualTo("next-page-token");
+
+        // 다음 페이지에서도 조회 조건은 유지하도록
+        assertThat(secondRequest.timePeriod())
+                .isEqualTo(firstRequest.timePeriod());
+        assertThat(secondRequest.granularity())
+                .isEqualTo(Granularity.MONTHLY);
         assertThat(secondRequest.metrics())
                 .isEqualTo(firstRequest.metrics());
         assertThat(secondRequest.groupBy())
