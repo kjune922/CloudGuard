@@ -1144,3 +1144,28 @@ AwsCostImportServiceTest 구현으로 검증해볼것들
 
 AWS 비용을 CloudGuard의 실제 저장 계층까지 연결되었는지 확인하기위해
 AwsCostImportServiceIntegrationTest 테스트 구현
+
+
+### 구현 내용
+
+1. AWS 서비스명을 CloudService로 매핑하고, 미분류 서비스는 OTHER로 처리했다.
+2. CostSource로 수동 등록(MANUAL)과 AWS 수집(AWS_COST_EXPLORER) 비용을 구분했다.
+3. 서비스·날짜·출처로 기존 AWS 기록을 조회하여, 없으면 저장하고 있으면 최신 금액으로 갱신하도록 구현했다.
+4. 자유로운 기간 조회를 지원하기 위해 수집 방식을 DAILY로 전환하고, AwsDailyServiceCost에 실제 비용 발생 날짜를 보존했다.
+5. 날짜별·서비스별로 비용을 합산하여 저장하도록 변경했다.
+
+### 검증 내용
+
+1. Mock 기반 단위 테스트로 AWS 요청 조건, 응답 변환, 날짜별 합산과 저장 호출을 검증했다.
+2. AWS 조회만 Mock으로 대체한 H2 통합 테스트로 실제 저장, 순차 재수집 시 중복 방지, 기존 ID를 유지한 금액 갱신, 수동 비용 보존을 검증했다.
+3. flush()와 clear() 후 재조회하여 변경된 금액이 DB에 반영됐는지 확인했다.
+4. 일별 수집 전환에 맞춰 기존 테스트를 수정하고 ./gradlew test 전체 통과를 확인했다.
+
+### 핵심 학습
+
+1. @Autowired는 등록된 Bean을 주입하고, @MockitoBean은 테스트에서 해당 Bean을 Mock으로 대체한다.
+2. Mock 설정은 실제 호출 메서드·인자와 일치해야 하며, given(...).willReturn(...)까지 완성해야 한다.
+3. 기간 전체 합계를 시작일에 저장하지 않고, 일별 비용을 해당 날짜에 저장해야 기간이 겹쳐도 올바르게 갱신할 수 있다.
+
+
+# 2026-08-31
