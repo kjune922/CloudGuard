@@ -1,6 +1,7 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
 import com.cloudguard.cloudguard.cost.aws.dto.AwsServiceCost;
+import com.cloudguard.cloudguard.cost.aws.exception.InvalidCostPeriodException;
 import com.cloudguard.cloudguard.cost.dto.AwsDailyServiceCost;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.costexplorer.CostExplorerClient;
@@ -163,11 +164,11 @@ public class AwsCostExplorerService {
 
     private void validatePeriod(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null){
-            throw  new IllegalArgumentException("시작과 종료일은 필수입니다.");
+            throw  new InvalidCostPeriodException("시작과 종료일은 필수입니다.");
         }
 
         if(!startDate.isBefore(endDate)){
-            throw new IllegalArgumentException("시작일은 종료일보다 빨라야 합니다.");
+            throw new InvalidCostPeriodException("시작일은 종료일보다 빨라야 합니다.");
         }
     }
 }

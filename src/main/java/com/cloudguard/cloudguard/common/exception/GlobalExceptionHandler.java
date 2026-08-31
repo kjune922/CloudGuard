@@ -3,6 +3,7 @@ package com.cloudguard.cloudguard.common.exception;
 import com.cloudguard.cloudguard.budget.exception.DuplicateMonthlyBudgetException;
 import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException;
 import com.cloudguard.cloudguard.budget.exception.WrongRequestBadRequestException;
+import com.cloudguard.cloudguard.cost.aws.exception.InvalidCostPeriodException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -102,6 +103,20 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "INVALID_PARAMETER_FORMAT",
                 "요청 파라미터 형식이 올바르지 않습니다.",
+                request
+        );
+    }
+
+    // 공통 예외처리에 400 연결
+    @ExceptionHandler(InvalidCostPeriodException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCostPeriod(
+            InvalidCostPeriodException exception,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "INVALID_COST_PERIOD",
+                exception.getMessage(),
                 request
         );
     }

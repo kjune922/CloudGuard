@@ -1169,3 +1169,20 @@ AwsCostImportServiceIntegrationTest 테스트 구현
 
 
 # 2026-08-31
+
+HTTP 요청 전달 및 오류 응답을 검증
+POSTMAN으로 결과 확인
+
+1. 정상 완료 시 204 확인
+![img_17.png](img_17.png)
+
+
+2. DB에 저장된 서비스별 비용과 총액 확인
+![img_18.png](img_18.png)
+
+   
+3. 1번을 다시 실행 후 2번을 실행해도, 값이 2배로 늘어나지않는것 체크
+![img_19.png](img_19.png)
+
+4. 시작일이 종료일보다 빠를 때 400을 뱉는지 체크
+![img_21.png](img_21.png)
