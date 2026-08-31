@@ -192,4 +192,108 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(awsResult.getCost()).isEqualByComparingTo("12");
 
     }
+
+    @Test
+    void 겹치는_기간을_재수집하면_해당_날짜만_갱신() {
+        LocalDate day10 = LocalDate.of(2026,8,10);
+        LocalDate day11 = LocalDate.of(2026,8,11);
+        LocalDate day12 = LocalDate.of(2026,8,12);
+        LocalDate day13 = LocalDate.of(2026,8,13);
+
+        // 1번째 조회 - 8.10 , 8.11 비용
+        given(awsCostExplorerService.getDailyServiceCosts(day10,day12))
+                .willReturn(List.of(
+                        new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("3"),
+                        "USD",
+                        day10),
+                        new AwsDailyServiceCost(
+                                "Amazon Simple Storage Service",
+                                new BigDecimal("5"),
+                                        "USD",
+                                        day11)
+                        ));
+
+        // 2번째 조회 - 8.11, 8.12 비용
+        given(awsCostExplorerService.getDailyServiceCosts(
+                day11,
+                day13
+        )).willReturn(List.of(
+                new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("7"),
+                        "USD",
+                        day11
+                ),
+                new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        new BigDecimal("2"),
+                        "USD",
+                        day12
+                )
+        ));
+
+        // 첫번째 수집
+        awsCostImportService.importCosts(day10, day12);
+
+        Long originalDay11Id = costRecordRepository
+                .findByServiceAndUsageDateAndSource(
+                        CloudService.S3,
+                        day11,
+                        CostSource.AWS_COST_EXPLORER
+                )
+                .orElseThrow()
+                .getId();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // 겹치는 기간 재수집 진행
+        awsCostImportService.importCosts(day11,day13);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Repository의 Between은 양끝 날짜 다 포함
+        List<CostRecord> records =
+                costRecordRepository.findByUsageDateBetween(day10, day12);
+
+        assertThat(records).hasSize(3);
+
+        CostRecord day10Record = costRecordRepository
+                .findByServiceAndUsageDateAndSource(
+                        CloudService.S3,
+                        day10,
+                        CostSource.AWS_COST_EXPLORER
+                ).orElseThrow();
+
+        CostRecord day11Record = costRecordRepository
+                .findByServiceAndUsageDateAndSource(
+                        CloudService.S3,
+                        day11,
+                        CostSource.AWS_COST_EXPLORER
+                ).orElseThrow();
+
+        CostRecord day12Record = costRecordRepository
+                .findByServiceAndUsageDateAndSource(
+                        CloudService.S3,
+                        day12,
+                        CostSource.AWS_COST_EXPLORER
+                ).orElseThrow();
+
+        // 2번째 조회 범위 밖의 기록은 유지
+        assertThat(day10Record.getCost())
+                .isEqualByComparingTo("3");
+
+        // 겹치는 날짜는 기존 ID 유지하면서 금액 갱신
+        assertThat(day11Record.getId())
+                .isEqualTo(originalDay11Id);
+        assertThat(day11Record.getCost())
+                .isEqualByComparingTo("7");
+
+        // 새로운 날짜는 추가함
+        assertThat(day12Record.getCost())
+                .isEqualByComparingTo("2");
+    }
 }
