@@ -1232,3 +1232,7 @@ monthly_budgets로 기존 Mysql 예약어엿던 yearMonth를 수정안했어서
 
 3. 서버 재시작 후 남아있는지 확인
 ![img_30.png](img_30.png)
+4. breakdown과 monthly status의 비용이 같은지 체크
+![img_31.png](img_31.png)
+
+![img_32.png](img_32.png)
