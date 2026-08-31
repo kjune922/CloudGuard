@@ -296,4 +296,37 @@ public class AwsCostImportServiceIntegrationTest {
         assertThat(day12Record.getCost())
                 .isEqualByComparingTo("2");
     }
+
+    @Test
+    void AWS의_작은_소수_비용도_DB보존() {
+        LocalDate startDate = LocalDate.of(2026, 8, 10);
+        LocalDate endDate = LocalDate.of(2026, 8, 11);
+        BigDecimal amount = new BigDecimal("0.0000000488");
+
+        given(awsCostExplorerService.getDailyServiceCosts(
+                startDate, endDate
+        )).willReturn(List.of(
+                new AwsDailyServiceCost(
+                        "Amazon Simple Storage Service",
+                        amount,
+                        "USD",
+                        startDate
+                )
+        ));
+
+        awsCostImportService.importCosts(startDate, endDate);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        CostRecord savedRecord =
+                costRecordRepository.findByServiceAndUsageDateAndSource(
+                        CloudService.S3,
+                        startDate,
+                        CostSource.AWS_COST_EXPLORER
+                ).orElseThrow();
+
+        assertThat(savedRecord.getCost())
+                .isEqualByComparingTo(amount);
+    }
 }

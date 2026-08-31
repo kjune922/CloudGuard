@@ -14,7 +14,10 @@ public class CostRecord {
 
     @Enumerated(EnumType.STRING)
     private CloudService service; // 사용한 서비스
+
+    @Column(precision = 38, scale = 18)
     private BigDecimal cost; // 비용
+
     private LocalDate usageDate; // 비용발생일
     @Enumerated(EnumType.STRING)
     private CostSource source;
