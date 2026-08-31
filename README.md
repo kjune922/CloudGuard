@@ -1193,3 +1193,26 @@ AWS 수집 통화인 USD가 아니면 보장하지않도록 검증하는 validat
 비용은 그대로 두고, 예산만 바꾸었을때 SAFE가 EXCEEDED가 되는지 확인
 월예산은 0.02 -> 100 으로 변경했음
 ![img_22.png](img_22.png)
+
+## MYSQL 실제 연결
+
+예산 등록 전 실제 AWS에서의 사용비용 체크
+![img_23.png](img_23.png)
+
+예산 등록
+![img_24.png](img_24.png)
+
+예산 상태 조회
+![img_25.png](img_25.png)
+
+서버 종료 후 다시 내가 설정한 local profile로 시작되는지 체크
+`2026-08-31T21:10:59.387+09:00  INFO 12212 --- 
+[cloudguard] [           main] c.c.cloudguard.CloudguardApplication:
+The following 1 profile is active: "local"`
+
+성공
+
+재시작 후 다시 조회는 실패 - 월예산이 저장되어있지않음
+![img_26.png](img_26.png)
+
+
