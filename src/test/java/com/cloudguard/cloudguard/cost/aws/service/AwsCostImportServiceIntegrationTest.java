@@ -1,5 +1,8 @@
 package com.cloudguard.cloudguard.cost.aws.service;
 
+import com.cloudguard.cloudguard.budget.domain.BudgetStatus;
+import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
+import com.cloudguard.cloudguard.budget.service.BudgetService;
 import com.cloudguard.cloudguard.cost.domain.CloudService;
 import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.domain.CostSource;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -34,6 +38,9 @@ public class AwsCostImportServiceIntegrationTest {
 
     @MockitoBean
     private AwsCostExplorerService awsCostExplorerService;
+
+    @Autowired
+    private BudgetService budgetService;
 
     @Test
     void AWS_비용을_DB에_실제로_저장() {
@@ -328,5 +335,74 @@ public class AwsCostImportServiceIntegrationTest {
 
         assertThat(savedRecord.getCost())
                 .isEqualByComparingTo(amount);
+    }
+
+    @Test
+    void AWS_비용을_재수집하면_예산_사용률과_상태도_갱신() {
+        YearMonth yearMonth = YearMonth.of(2026, 8);
+        LocalDate startDate = LocalDate.of(2026, 8, 10);
+        LocalDate endDate = LocalDate.of(2026, 8, 11);
+
+        budgetService.addMonthlyBudget(
+                yearMonth,
+                new BigDecimal("100")
+        );
+
+        AwsDailyServiceCost firstCost = new AwsDailyServiceCost(
+                "Amazon Simple Storage Service",
+                new BigDecimal("80"),
+                "USD",
+                startDate
+        );
+
+        AwsDailyServiceCost updatedCost = new AwsDailyServiceCost(
+                "Amazon Simple Storage Service",
+                new BigDecimal("110"),
+                "USD",
+                startDate
+        );
+
+        given(awsCostExplorerService.getDailyServiceCosts(
+                startDate, endDate
+        )).willReturn(
+                List.of(firstCost),
+                List.of(updatedCost)
+        );
+
+        // 최초 수집: 비용 80 / 예산 100
+        awsCostImportService.importCosts(startDate, endDate);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        BudgetStatusResponse firstStatus =
+                budgetService.determineMonthlyStatusDetail(yearMonth);
+
+        assertThat(firstStatus.getMonthlyLimit())
+                .isEqualByComparingTo("100");
+        assertThat(firstStatus.getTotalCost())
+                .isEqualByComparingTo("80");
+        assertThat(firstStatus.getUsageRate())
+                .isEqualByComparingTo("80");
+        assertThat(firstStatus.getStatus())
+                .isEqualTo(BudgetStatus.CAUTION);
+
+        // 같은 기간 재수집: 기존 비용을 110으로 갱신
+        awsCostImportService.importCosts(startDate, endDate);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        BudgetStatusResponse updatedStatus =
+                budgetService.determineMonthlyStatusDetail(yearMonth);
+
+        assertThat(updatedStatus.getMonthlyLimit())
+                .isEqualByComparingTo("100");
+        assertThat(updatedStatus.getTotalCost())
+                .isEqualByComparingTo("110");
+        assertThat(updatedStatus.getUsageRate())
+                .isEqualByComparingTo("110");
+        assertThat(updatedStatus.getStatus())
+                .isEqualTo(BudgetStatus.EXCEEDED);
     }
 }
