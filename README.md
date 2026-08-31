@@ -1216,3 +1216,19 @@ The following 1 profile is active: "local"`
 ![img_26.png](img_26.png)
 
 
+알고보니 우리가 배포용 appliation-local.properties를 따로 설정안하고
+monthly_budgets로 기존 Mysql 예약어엿던 yearMonth를 수정안했어서 
+에러가 났었다
+![img_27.png](img_27.png)
+
+수정후 서버실행 성공 후에 workbench 속 테이블들
+
+## 재시도
+1. 예산 설정
+![img_28.png](img_28.png)
+
+2. DB확인
+![img_29.png](img_29.png)
+
+3. 서버 재시작 후 남아있는지 확인
+![img_30.png](img_30.png)
