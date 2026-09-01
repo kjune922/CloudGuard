@@ -22,6 +22,7 @@ services:
     build:
       context: .
     image: cloudguard:local
+    restart: on-failure
     environment:
       SPRING_PROFILES_ACTIVE: prod
       CLOUDGUARD_DB_URL: jdbc:mysql://db:3306/cloudguard?useSSL=false&allowPublicKeyRetrieval=true
