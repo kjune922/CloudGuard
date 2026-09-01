@@ -40,7 +40,6 @@ out/
 .env
 .env.*
 application-local.properties
-application-prod.properties
 
 ### IntelliJ ###
 .idea/
