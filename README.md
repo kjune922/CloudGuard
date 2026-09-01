@@ -1236,3 +1236,27 @@ monthly_budgets로 기존 Mysql 예약어엿던 yearMonth를 수정안했어서
 ![img_31.png](img_31.png)
 
 ![img_32.png](img_32.png)
+
+# 2026-09-01
+
+## Flyway 기반 DB 마이그레이션 도입
+
+기존에는 `spring.jpa.hibernate.ddl-auto=update`를 사용해 Hibernate가 
+엔티티를 기준으로 DB 스키마를 자동 변경했다.
+
+이 방식은 개발 초기에는 편리하지만 어떤 SQL이 실행됐는지 Git에 기록되지 않고,
+로컬, 테스트, 배포 환경의 DB 구조가 달라질 수 있다. 운영 환경에서 애플리케이션 실행과 동시에 스키마가 자동 변경되는 문제도 방지할 필요가 있었다.
+
+따라서 Flyway를 도입해 DB 스키마 변경 이력을 SQL 파일로 관리하도록 전환했다.
+
+### 의존성
+
+Spring Boot 4의 Flyway 자동 설정과 MySQL 지원을 위해 다음 의존성을 추가했다.
+
+`
+implementation 'org.springframework.boot:spring-boot-starter-flyway'
+runtimeOnly 'org.flywaydb:flyway-mysql'
+`
+핵심은 java 코드는 git으로 버전관리하고, DB구조는 Flyway로 버전관리한다는 것
+
+
