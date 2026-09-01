@@ -21,7 +21,7 @@ public class MonthlyBudget {
     @Column(name = "budget_month",nullable = false,unique = true,length = 7)
     private YearMonth yearMonth;
 
-    @Column(name = "monthly_limit",nullable = false)
+    @Column(name = "monthly_limit", nullable = false, precision = 38, scale = 18)
     private BigDecimal monthlyLimit;
 
     protected MonthlyBudget() {

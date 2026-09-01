@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "cost_records")
 public class CostRecord {
 
     @Id
@@ -13,13 +14,17 @@ public class CostRecord {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private CloudService service; // 사용한 서비스
 
-    @Column(precision = 38, scale = 18)
+    @Column(nullable = false, precision = 38, scale = 18)
     private BigDecimal cost; // 비용
 
+    @Column(name = "usage_date", nullable = false)
     private LocalDate usageDate; // 비용발생일
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private CostSource source;
 
     protected CostRecord() {
