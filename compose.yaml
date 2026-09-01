@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: cloudguard
+      MYSQL_USER: ${CLOUDGUARD_DOCKER_DB_USERNAME}
+      MYSQL_PASSWORD: ${CLOUDGUARD_DOCKER_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${CLOUDGUARD_DOCKER_DB_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "3307:3306"
+    volumes:
+      - cloudguard-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u\"$${MYSQL_USER}\" -p\"$${MYSQL_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+    image: cloudguard:local
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      CLOUDGUARD_DB_URL: jdbc:mysql://db:3306/cloudguard?useSSL=false&allowPublicKeyRetrieval=true
+      CLOUDGUARD_DB_USERNAME: ${CLOUDGUARD_DOCKER_DB_USERNAME}
+      CLOUDGUARD_DB_PASSWORD: ${CLOUDGUARD_DOCKER_DB_PASSWORD}
+      SERVER_PORT: 8080
+      TZ: Asia/Seoul
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+volumes:
+  cloudguard-mysql-data:

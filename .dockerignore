@@ -1,0 +1,15 @@
+.git
+.github
+.gradle
+.idea
+build
+out
+*.iml
+
+.env
+.env.*
+
+**/application-local.properties
+
+README.md
+img*.png
