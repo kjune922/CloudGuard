@@ -1259,4 +1259,7 @@ runtimeOnly 'org.flywaydb:flyway-mysql'
 `
 핵심은 java 코드는 git으로 버전관리하고, DB구조는 Flyway로 버전관리한다는 것
 
+# 2026-09-03
+
+<img width="1006" height="538" alt="image" src="https://github.com/user-attachments/assets/1226f8ee-175c-4386-b0ae-8c804b0c8dd2" />
 
