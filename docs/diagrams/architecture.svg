@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="780" viewBox="0 0 1280 780" role="img" aria-label="AWS 비용 수집과 월 예산 조회">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="690" viewBox="0 0 1280 690" role="img" aria-label="AWS 비용 수집과 월 예산 조회">
 <title>AWS 비용 수집과 월 예산 조회</title>
 <rect width="100%" height="100%" fill="white"/>
 <text x="36" y="64" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="29" font-weight="700" fill="#172B46">AWS 비용 수집과 월 예산 조회</text>
-<text x="36" y="95" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">현재 구현된 비용 입력 경로와 예산 상태 조회 흐름</text>
+<g transform="translate(0,-25)">
 <rect x="36" y="140" width="280" height="125" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="56" y="181" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">AWS Cost Explorer</text>
 <text x="56" y="215" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">DAILY / SERVICE</text>
@@ -53,5 +53,5 @@
 <polygon points="1090,500 1095.0,511.0 1085.0,511.0" fill="#2463AA"/>
 <polygon points="840,630 851.0,625.0 851.0,635.0" fill="#2463AA"/>
 <text x="912" y="671" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="16" font-weight="400" fill="#172B46">월 예산 조회</text>
-<text x="36" y="749" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">현재 월 집계는 Repository에서 기록을 조회한 뒤 Java의 MonthlyCost로 합산합니다.</text>
+</g>
 </svg>
