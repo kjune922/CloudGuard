@@ -29,7 +29,9 @@
 
 ![월 예산과 일별 비용의 테이블 구조](docs/diagrams/data-model.svg)
 
-월 예산과 비용은 별도 테이블로 관리합니다. `BudgetService`가 해당 월 예산과 비용 합계를 조회해 상태를 계산합니다. [스키마와 제약](docs/ARCHITECTURE.md#데이터-모델)
+월 예산과 비용은 별도 테이블로 관리합니다. 
+
+`BudgetService`가 해당 월 예산과 비용 합계를 조회해 상태를 계산합니다. [스키마와 제약](docs/ARCHITECTURE.md#데이터-모델)
 
 ## 기술과 검증
 
@@ -39,25 +41,3 @@
 | 데이터 | MySQL 8.0, Flyway, H2 테스트 DB |
 | 연동과 테스트 | AWS SDK v2, JUnit 5, AssertJ, Mockito, MockMvc |
 | 실행 및 배포 구성 | Gradle, Docker Compose, GitHub Actions, ECR, EC2, SSM |
-
-기준 [Actions 실행](https://github.com/kjune922/CloudGuard/actions/runs/33743715476)의 테스트 단계는 통과했습니다. AWS 자격 증명 설정은 실패하여 ECR, SSM 단계는 실행되지 않았습니다. [검증 환경과 배포 도표](docs/ARCHITECTURE.md#검증-환경과-배포-구성)
-
-현재 재수집 검증은 순차 실행 범위입니다. 예산 반올림 경계값, 동시 수집 중복, 실제 MySQL 마이그레이션 검증을 먼저 개선합니다. 상세 재현 조건은 [체크리스트](docs/READINESS.md)에 정리했습니다.
-
-## 실행
-
-Java 17 JDK와 Docker Compose가 필요합니다. 저장소 루트의 `.env`에 아래 값을 설정합니다.
-
-```dotenv
-CLOUDGUARD_DOCKER_DB_USERNAME=cloudguard
-CLOUDGUARD_DOCKER_DB_PASSWORD=choose_a_local_password
-CLOUDGUARD_DOCKER_DB_ROOT_PASSWORD=choose_a_different_local_password
-```
-
-```bash
-docker compose up --build -d
-curl 'http://localhost:8080/api/costs/monthly/breakdown?yearMonth=2026-08'
-bash gradlew test
-```
-
-수동 비용 등록, 조회는 위 환경에서 실행할 수 있습니다. AWS 수집에는 별도 자격 증명이 필요하며 현재 Compose에는 전달 설정이 없습니다. [전체 실행 절차](docs/RUNBOOK.md)
