@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="570" viewBox="0 0 1280 570" role="img" aria-label="외부 응답 변환과 작은 소수 비용 보존">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="485" viewBox="0 0 1280 485" role="img" aria-label="외부 응답 변환과 작은 소수 비용 보존">
 <title>외부 응답 변환과 작은 소수 비용 보존</title>
 <rect width="100%" height="100%" fill="white"/>
 <text x="36" y="64" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="29" font-weight="700" fill="#172B46">외부 응답 변환과 작은 소수 비용 보존</text>
-<text x="36" y="95" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">AWS 응답 형식과 내부 저장 규칙을 분리</text>
+<g transform="translate(0,-25)">
 <rect x="36" y="135" width="340" height="140" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="56" y="176" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">AWS 응답</text>
 <text x="56" y="210" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">금액: &quot;0.0000000488&quot;</text>
@@ -26,5 +26,5 @@
 <rect x="36" y="360" width="1208" height="125" rx="14" fill="#F5F9FD" stroke="#CCD9E8"/>
 <text x="58" y="401" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="21" font-weight="700" fill="#2463AA">검증 경로</text>
 <text x="58" y="444" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="24" font-weight="400" fill="#172B46">저장 → flush() → clear() → 재조회 → 동일 금액 확인</text>
-<text x="36" y="539" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">페이지 토큰 처리와 변환은 AWS Client Mock으로, 실제 저장은 H2 통합 테스트로 검증합니다.</text>
+</g>
 </svg>
