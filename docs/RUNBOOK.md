@@ -68,9 +68,9 @@ curl -X POST 'http://localhost:8080/api/aws/costs/import?startDate=2026-08-01&en
 | GET | `/api/costs/monthly/breakdown?yearMonth=2026-08` | 서비스별 비용과 합계 |
 | POST | `/api/budgets/add` | 월 예산 등록 |
 | PUT | `/api/budgets/2026-08` | 예산 변경, 본문 `{"monthlyLimit":200}` |
-| GET | `/api/budgets/status?yearMonth=2026-08` | 예산·비용·사용률·상태 |
+| GET | `/api/budgets/status?yearMonth=2026-08` | 예산, 비용, 사용률, 상태 |
 | GET | `/api/aws/costs?startDate=2026-08-01&endDate=2026-09-01` | AWS 월 단위 조회, 저장 없음 |
-| POST | `/api/aws/costs/import?startDate=2026-08-01&endDate=2026-09-01` | AWS 일별 저장·갱신 |
+| POST | `/api/aws/costs/import?startDate=2026-08-01&endDate=2026-09-01` | AWS 일별 저장, 갱신 |
 
 월 집계는 수동 비용과 AWS 비용을 모두 더합니다. 같은 청구 금액을 두 출처에 입력하면 모두 포함됩니다. AWS 월 단위 조회 DTO에는 발생 월 필드가 없어 여러 달의 결과를 구분하는 데 제한이 있습니다.
 
@@ -84,4 +84,4 @@ JRE만으로는 컴파일할 수 없으므로 Java 17 JDK가 필요합니다. �
 
 배포 워크플로는 main push 또는 수동 실행으로 동작합니다. Actions 변수 `AWS_REGION`, `ECR_REPOSITORY`, `EC2_INSTANCE_ID`, `AWS_ROLE_ARN`, EC2 환경 파일 `/home/ubuntu/cloudguard-prod.env`, 인스턴스 역할과 SSM 구성이 필요합니다.
 
-2026-09-03 실행은 테스트 이후 자격 증명 설정이 실패했습니다. [실행 기록](https://github.com/kjune922/CloudGuard/actions/runs/33743715476)에서 ECR·SSM 단계 성공 여부를 확인해야 합니다.
+2026-09-03 실행은 테스트 이후 자격 증명 설정이 실패했습니다. [실행 기록](https://github.com/kjune922/CloudGuard/actions/runs/33743715476)에서 ECR, SSM 단계 성공 여부를 확인해야 합니다.

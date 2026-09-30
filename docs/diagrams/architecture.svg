@@ -6,11 +6,11 @@
 <rect x="36" y="140" width="280" height="125" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="56" y="181" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">AWS Cost Explorer</text>
 <text x="56" y="215" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">DAILY / SERVICE</text>
-<text x="56" y="242" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">금액 문자열 · 발생 날짜</text>
+<text x="56" y="242" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">금액 문자열, 발생 날짜</text>
 <rect x="420" y="130" width="420" height="155" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="440" y="171" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">AWS 수집 서비스</text>
-<text x="440" y="205" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">페이지 조회 · USD 검증</text>
-<text x="440" y="232" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">서비스명 매핑 · 날짜별 합산</text>
+<text x="440" y="205" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">페이지 조회, USD 검증</text>
+<text x="440" y="232" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">서비스명 매핑, 날짜별 합산</text>
 <text x="440" y="259" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">AwsCostExplorer / ImportService</text>
 <rect x="36" y="350" width="280" height="110" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="56" y="391" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">수동 비용 등록 API</text>
@@ -18,7 +18,7 @@
 <rect x="420" y="355" width="420" height="130" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="440" y="396" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">CostService</text>
 <text x="440" y="430" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">AWS 기록 생성 또는 갱신</text>
-<text x="440" y="457" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">수동 비용 저장 · 월 비용 집계</text>
+<text x="440" y="457" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">수동 비용 저장, 월 비용 집계</text>
 <rect x="935" y="345" width="309" height="155" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
 <text x="955" y="386" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">MySQL</text>
 <text x="955" y="420" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">cost_records</text>

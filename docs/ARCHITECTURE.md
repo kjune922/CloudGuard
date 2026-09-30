@@ -6,7 +6,7 @@
 
 ![비용 수집과 예산 조회](diagrams/architecture.svg)
 
-AWS 수집은 `POST /api/aws/costs/import`로 시작합니다. `AwsCostExplorerService`가 DAILY/SERVICE 조건으로 모든 페이지를 읽고, `AwsCostImportService`가 USD 검증과 서비스명 매핑 후 날짜·서비스별 합계를 만듭니다. `CostService`는 각 합계를 기존 AWS 기록에 반영합니다.
+AWS 수집은 `POST /api/aws/costs/import`로 시작합니다. `AwsCostExplorerService`가 DAILY/SERVICE 조건으로 모든 페이지를 읽고, `AwsCostImportService`가 USD 검증과 서비스명 매핑 후 날짜, 서비스별 합계를 만듭니다. `CostService`는 각 합계를 기존 AWS 기록에 반영합니다.
 
 예산 상태 조회는 `BudgetService`가 월 예산과 `CostService`의 월 비용을 가져온 뒤 `BudgetPolicy`에 판단을 맡깁니다. 현재 월 비용은 Repository에서 기간 내 기록을 조회한 뒤 `MonthlyCost`가 Java에서 합산합니다. DB 집계 쿼리로 최적화한 상태는 아닙니다.
 
@@ -20,7 +20,7 @@ AWS 조회 범위의 종료일은 포함되지 않습니다. 8월 전체는 `202
 
 `service + usage_date + AWS_COST_EXPLORER` 조건에 맞는 기록이 있으면 금액을 갱신하고, 없으면 새 기록을 저장합니다. 수동 비용은 `MANUAL`로 저장하여 이 조회에서 제외합니다.
 
-이 기준은 애플리케이션의 조회·갱신 규칙입니다. V1의 `idx_cost_records_import_lookup`은 일반 인덱스이므로 DB에서 동시 INSERT를 막는 고유 제약은 아닙니다. 재수집 응답에서 사라진 항목의 처리 정책도 후속 과제입니다.
+이 기준은 애플리케이션의 조회, 갱신 규칙입니다. V1의 `idx_cost_records_import_lookup`은 일반 인덱스이므로 DB에서 동시 INSERT를 막는 고유 제약은 아닙니다. 재수집 응답에서 사라진 항목의 처리 정책도 후속 과제입니다.
 
 근거: [저장 서비스](../src/main/java/com/cloudguard/cloudguard/cost/service/CostService.java), [재수집 통합 테스트](../src/test/java/com/cloudguard/cloudguard/cost/aws/service/AwsCostImportServiceIntegrationTest.java)
 
@@ -30,7 +30,7 @@ AWS 조회 범위의 종료일은 포함되지 않습니다. 8월 전체는 `202
 
 금액 문자열은 `BigDecimal`로 변환하고, 서비스명은 `AwsServiceNameMapper`로 내부 enum에 대응시킵니다. 여러 미분류 서비스는 `OTHER`에 합산합니다. 저장 전 USD를 확인하며 현재 음수 비용은 거부합니다.
 
-`DECIMAL(38,18)`은 엔티티와 V1 SQL에 함께 지정했습니다. 작은 금액의 저장·재조회 검증은 H2 기반이며, 실제 MySQL의 마이그레이션과 제약 검증은 별도 과제입니다.
+`DECIMAL(38,18)`은 엔티티와 V1 SQL에 함께 지정했습니다. 작은 금액의 저장, 재조회 검증은 H2 기반이며, 실제 MySQL의 마이그레이션과 제약 검증은 별도 과제입니다.
 
 근거: [AWS 조회 서비스](../src/main/java/com/cloudguard/cloudguard/cost/aws/service/AwsCostExplorerService.java), [서비스명 Mapper](../src/main/java/com/cloudguard/cloudguard/cost/aws/mapper/AwsServiceNameMapper.java)
 
@@ -40,10 +40,10 @@ AWS 조회 범위의 종료일은 포함되지 않습니다. 8월 전체는 `202
 
 | 테이블 | 저장 단위와 제약 |
 | --- | --- |
-| `cost_records` | 서비스·발생 날짜·출처와 금액. PK는 `id`, 금액은 0 이상 |
+| `cost_records` | 서비스, 발생 날짜, 출처와 금액. PK는 `id`, 금액은 0 이상 |
 | `monthly_budgets` | 월별 예산. `budget_month` UNIQUE, 예산은 0 초과 |
 
-비용의 기간 조회, 서비스·기간 조회, 재수집 기록 조회에 필요한 인덱스가 있습니다. 두 테이블에 외래 키 관계는 없고 서비스 계층에서 월 기준으로 함께 조회합니다. `MonthlyCost`와 `BudgetPolicy`는 계산을 담당하는 객체이며 테이블이 아닙니다.
+비용의 기간 조회, 서비스, 기간 조회, 재수집 기록 조회에 필요한 인덱스가 있습니다. 두 테이블에 외래 키 관계는 없고 서비스 계층에서 월 기준으로 함께 조회합니다. `MonthlyCost`와 `BudgetPolicy`는 계산을 담당하는 객체이며 테이블이 아닙니다.
 
 근거: [V1 SQL](../src/main/resources/db/migration/V1__init_schema.sql), [CostRecord](../src/main/java/com/cloudguard/cloudguard/cost/domain/CostRecord.java), [BudgetPolicy](../src/main/java/com/cloudguard/cloudguard/budget/domain/BudgetPolicy.java)
 
@@ -53,7 +53,7 @@ AWS 조회 범위의 종료일은 포함되지 않습니다. 8월 전체는 `202
 
 | 환경 | 설정과 확인 범위 |
 | --- | --- |
-| 일반 테스트 | H2 `create-drop`, Flyway 비활성화, AWS Mock. 도메인·저장·서비스·HTTP 동작 검증 |
+| 일반 테스트 | H2 `create-drop`, Flyway 비활성화, AWS Mock. 도메인, 저장, 서비스, HTTP 동작 검증 |
 | 배포 프로필 | MySQL, Flyway, `ddl-auto=validate`. 일반 테스트 통과만으로 V1 실행 검증을 대신하지 않음 |
 | Actions | main push 또는 수동 실행. 테스트 후 OIDC → ECR → SSM/EC2 순서로 구성 |
 
