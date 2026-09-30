@@ -156,11 +156,11 @@ CloudGuard는 비용 기록, 월별 집계, 예산 정책을 하나의 서비스
 
 ### 월별 비용 상세 조회
 
-![월별 비용 상세 조회](../img_6.png)
+![월별 비용 상세 조회](image/img_6.png)
 
 ### 예산 상태 상세 조회
 
-![예산 상태 상세 조회](../img_8.png)
+![예산 상태 상세 조회](image/img_8.png)
 
 ### CostService Test 진행 중 에러
 
@@ -189,27 +189,27 @@ CostRecordRepository Bean을 만들수 없는 에러 발생
 
 ## 2026-08-13
 
-![img.png](../img.png)
+![img.png](image/img.png)
 
 POSTMAN 활용해서 request보내고 잘 보내졌는지 확인
 
-![img_1.png](../img_1.png)
+![img_1.png](image/img_1.png)
 
 POSTMAN 활용해서 DB 중복 데이터에 대해 에러발생하는지 확인
 
 ## 2026-08-14
 
-![img_2.png](../img_2.png)
+![img_2.png](image/img_2.png)
 
 반환 에러메시지 500 -> 409 conflict로 변경
 
 ## 2026-08-22
 
-![img_3.png](../img_3.png)
+![img_3.png](image/img_3.png)
 
-![img_4.png](../img_4.png)
+![img_4.png](image/img_4.png)
 
-![img_5.png](../img_5.png)
+![img_5.png](image/img_5.png)
 
 
 ## 2026-08-23
@@ -350,7 +350,7 @@ Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “�
 
 -------------------------------------------
 
-![img_6.png](../img_6.png)
+![img_6.png](image/img_6.png)
 
 월별 비용 상세 기능 도메인,Repository,Service,Controller,실제 DB 까지 완료
 
@@ -395,10 +395,10 @@ Stream 방식은 “값들을 순서대로 반복한다”는 과정 대신 “�
 예산 변경값이 DB에 반영되고, 
 상세 상태 조회 시 예산,비용,사용률,상태가 함께 재계산되는 전체 흐름을 Postman으로 검증.
 
-![img_8.png](../img_8.png)
+![img_8.png](image/img_8.png)
 상세 예산 설정 성공
 
-![img_7.png](../img_7.png)
+![img_7.png](image/img_7.png)
 상세 예산 업데이트 설정 성공
 
 # 2026-08-24
@@ -461,11 +461,11 @@ common.exception 으로 공통예외를 모아놓을 예정
 
 ### POSTMAN 테스트 진행
 1. 미등록 예산 조회 - 404
-![img_9.png](../img_9.png)
+![img_9.png](image/img_9.png)
 2. 중복 예산 등록 -409
-![img_10.png](../img_10.png)
+![img_10.png](image/img_10.png)
 3. 잘못된 예산 변경 - 400
-![img_11.png](../img_11.png)
+![img_11.png](image/img_11.png)
 
 
 ### `@Valid` 검증 오류 메시지 추출 과정 <새로알게된 개념>
@@ -548,11 +548,11 @@ monthlyLimit = 0
 
 1. 등록 요청에서 연월 누락 케이스
 
-![img_12.png](../img_12.png)
+![img_12.png](image/img_12.png)
 
 2. 변경 요청에서 월 예산 누락 케이스
 
-![img_13.png](../img_13.png)
+![img_13.png](image/img_13.png)
 
 # 2026-08-26
 
@@ -685,7 +685,7 @@ verifyNoInteractions(costService);
 
 추가로 `costs` 라고 오타가난걸 `cost`로 다시 수정했다.
 
-![img_14.png](../img_14.png)
+![img_14.png](image/img_14.png)
 
 자동 수집 구조 설계 전 ./gradlew test 진행
 
@@ -774,7 +774,7 @@ Tax
 
 서비스별 비용은 다음 구조로 반환된다.
 
-![img_15.png](../img_15.png)
+![img_15.png](image/img_15.png)
 
 ```json
 {
@@ -1087,7 +1087,7 @@ AwsCostExplorerService 구현
 하지만 아직 HTTP 요청으로 이 기능을 수행할 순 없음. 그래서 이번엔 Controller를 연결해서
 Postman으로 실제 조회할수 있게 만들어보자
 
-![img_16.png](../img_16.png)
+![img_16.png](image/img_16.png)
 
 ReqeustParma으로 startDate와 endDate를 조회해보았음
 참고로 startDate가 8월 1일이고
@@ -1180,36 +1180,36 @@ HTTP 요청 전달 및 오류 응답을 검증
 POSTMAN으로 결과 확인
 
 1. 정상 완료 시 204 확인
-![img_17.png](../img_17.png)
+![img_17.png](image/img_17.png)
 
 
 2. DB에 저장된 서비스별 비용과 총액 확인
-![img_18.png](../img_18.png)
+![img_18.png](image/img_18.png)
 
    
 3. 1번을 다시 실행 후 2번을 실행해도, 값이 2배로 늘어나지않는것 체크
-![img_19.png](../img_19.png)
+![img_19.png](image/img_19.png)
 
 4. 시작일이 종료일보다 빠를 때 400을 뱉는지 체크
-![img_21.png](../img_21.png)
+![img_21.png](image/img_21.png)
 
 AWS 수집 통화인 USD가 아니면 보장하지않도록 검증하는 validateCurrency 추가하고 테스트 수행
 
 
 비용은 그대로 두고, 예산만 바꾸었을때 SAFE가 EXCEEDED가 되는지 확인
 월예산은 0.02 -> 100 으로 변경했음
-![img_22.png](../img_22.png)
+![img_22.png](image/img_22.png)
 
 ## MYSQL 실제 연결
 
 예산 등록 전 실제 AWS에서의 사용비용 체크
-![img_23.png](../img_23.png)
+![img_23.png](image/img_23.png)
 
 예산 등록
-![img_24.png](../img_24.png)
+![img_24.png](image/img_24.png)
 
 예산 상태 조회
-![img_25.png](../img_25.png)
+![img_25.png](image/img_25.png)
 
 서버 종료 후 다시 내가 설정한 local profile로 시작되는지 체크
 `2026-08-31T21:10:59.387+09:00  INFO 12212 --- 
@@ -1219,29 +1219,29 @@ The following 1 profile is active: "local"`
 성공
 
 재시작 후 다시 조회는 실패 - 월예산이 저장되어있지않음
-![img_26.png](../img_26.png)
+![img_26.png](image/img_26.png)
 
 
 알고보니 우리가 배포용 appliation-local.properties를 따로 설정안하고
 monthly_budgets로 기존 Mysql 예약어엿던 yearMonth를 수정안했어서 
 에러가 났었다
-![img_27.png](../img_27.png)
+![img_27.png](image/img_27.png)
 
 수정후 서버실행 성공 후에 workbench 속 테이블들
 
 ## 재시도
 1. 예산 설정
-![img_28.png](../img_28.png)
+![img_28.png](image/img_28.png)
 
 2. DB확인
-![img_29.png](../img_29.png)
+![img_29.png](image/img_29.png)
 
 3. 서버 재시작 후 남아있는지 확인
-![img_30.png](../img_30.png)
+![img_30.png](image/img_30.png)
 4. breakdown과 monthly status의 비용이 같은지 체크
-![img_31.png](../img_31.png)
+![img_31.png](image/img_31.png)
 
-![img_32.png](../img_32.png)
+![img_32.png](image/img_32.png)
 
 # 2026-09-01
 
