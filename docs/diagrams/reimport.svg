@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="740" viewBox="0 0 1280 740" role="img" aria-label="재수집 시 생성과 갱신의 기준">
+<title>재수집 시 생성과 갱신의 기준</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="36" y="64" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="29" font-weight="700" fill="#172B46">재수집 시 생성과 갱신의 기준</text>
+<text x="36" y="95" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">서비스 + 발생 날짜 + AWS_COST_EXPLORER로 기존 AWS 기록을 조회</text>
+<rect x="36" y="135" width="350" height="110" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="56" y="176" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">일별 응답 합산</text>
+<text x="56" y="210" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">같은 날짜, 내부 서비스별 합계</text>
+<rect x="465" y="135" width="350" height="110" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="485" y="176" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">기존 AWS 기록 조회</text>
+<text x="485" y="210" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">서비스, 날짜, 출처 조건</text>
+<polyline points="386,190 465,190" fill="none" stroke="#2463AA" stroke-width="3"/>
+<polygon points="465,190 454.0,195.0 454.0,185.0" fill="#2463AA"/>
+<rect x="900" y="125" width="344" height="135" rx="14" fill="#F5F7FA" stroke="#CCD9E8"/>
+<text x="920" y="166" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#586B82">수동 비용은 별도 출처</text>
+<text x="920" y="200" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">source = MANUAL</text>
+<text x="920" y="227" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">AWS 조회 조건에 포함되지 않음</text>
+<rect x="160" y="345" width="420" height="120" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="180" y="386" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">기록이 있으면 금액 변경</text>
+<text x="180" y="420" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">기존 ID 유지, updateCost()</text>
+<rect x="700" y="345" width="420" height="120" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="720" y="386" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">기록이 없으면 새로 저장</text>
+<text x="720" y="420" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">source = AWS_COST_EXPLORER</text>
+<polyline points="640,245 640,295 370,295 370,345" fill="none" stroke="#2463AA" stroke-width="3"/>
+<polygon points="370,345 365.0,334.0 375.0,334.0" fill="#2463AA"/>
+<text x="385" y="285" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="17" font-weight="400" fill="#172B46">있음</text>
+<polyline points="640,295 910,295 910,345" fill="none" stroke="#2463AA" stroke-width="3"/>
+<polygon points="910,345 905.0,334.0 915.0,334.0" fill="#2463AA"/>
+<text x="837" y="285" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="17" font-weight="400" fill="#172B46">없음</text>
+<rect x="36" y="525" width="1208" height="125" rx="14" fill="#F5F9FD" stroke="#CCD9E8"/>
+<text x="58" y="565" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="21" font-weight="700" fill="#2463AA">순차 재수집 통합 테스트</text>
+<text x="58" y="605" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="22" font-weight="400" fill="#172B46">AWS 10.5 → 12 : 기록 1건과 기존 ID 유지    |    수동 100 : 변경 없이 보존</text>
+<text x="36" y="708" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">현재는 순차 실행 검증입니다. 동시 요청의 DB 고유 제약과 충돌 정책은 후속 과제입니다.</text>
+</svg>
