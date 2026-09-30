@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="710" viewBox="0 0 1280 710" role="img" aria-label="검증 환경과 배포 구성">
+<title>검증 환경과 배포 구성</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="36" y="64" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="29" font-weight="700" fill="#172B46">검증 환경과 배포 구성</text>
+<text x="36" y="95" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">구현된 설정과 확인한 실행 결과를 구분</text>
+<rect x="36" y="130" width="580" height="150" rx="14" fill="#EEF8F3" stroke="#CCD9E8"/>
+<text x="56" y="171" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#217A59">일반 테스트</text>
+<text x="56" y="205" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">AWS 호출은 Mock · DB는 H2 create-drop</text>
+<text x="56" y="232" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">도메인 / Repository / Service / Controller</text>
+<text x="56" y="259" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">Flyway는 비활성화</text>
+<rect x="664" y="130" width="580" height="150" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="684" y="171" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#2463AA">배포 프로필</text>
+<text x="684" y="205" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">MySQL + Flyway V1</text>
+<text x="684" y="232" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">ddl-auto=validate</text>
+<text x="684" y="259" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">Docker Compose 볼륨 · healthcheck</text>
+<rect x="36" y="365" width="278" height="110" rx="14" fill="#EEF8F3" stroke="#CCD9E8"/>
+<text x="56" y="406" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#217A59">테스트</text>
+<text x="56" y="440" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">기준 실행에서 통과</text>
+<rect x="346" y="365" width="278" height="110" rx="14" fill="#FFF5E9" stroke="#CCD9E8"/>
+<text x="366" y="406" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#A4631C">AWS OIDC</text>
+<text x="366" y="440" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">자격 증명 설정 실패</text>
+<rect x="656" y="365" width="278" height="110" rx="14" fill="#F5F7FA" stroke="#CCD9E8"/>
+<text x="676" y="406" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#586B82">ECR 이미지</text>
+<text x="676" y="440" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">후속 단계 미실행</text>
+<rect x="966" y="365" width="278" height="110" rx="14" fill="#F5F7FA" stroke="#CCD9E8"/>
+<text x="986" y="406" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="700" fill="#586B82">SSM / EC2</text>
+<text x="986" y="440" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">후속 단계 미실행</text>
+<polyline points="314,420 346,420" fill="none" stroke="#586B82" stroke-width="3"/>
+<polygon points="346,420 335.0,425.0 335.0,415.0" fill="#586B82"/>
+<polyline points="624,420 656,420" fill="none" stroke="#586B82" stroke-width="3"/>
+<polygon points="656,420 645.0,425.0 645.0,415.0" fill="#586B82"/>
+<polyline points="934,420 966,420" fill="none" stroke="#586B82" stroke-width="3"/>
+<polygon points="966,420 955.0,425.0 955.0,415.0" fill="#586B82"/>
+<rect x="36" y="535" width="1208" height="98" rx="14" fill="#F5F9FD" stroke="#CCD9E8"/>
+<text x="58" y="575" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="21" font-weight="700" fill="#2463AA">다음 검증</text>
+<text x="58" y="609" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="400" fill="#172B46">Testcontainers MySQL에서 Flyway · 저장 제약 검증    |    PR 테스트 CI와 배포 CI 분리</text>
+<text x="36" y="680" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">실행 근거: Actions 33743715476 · MySQL 마이그레이션 자동 검증과 배포 성공은 아직 미확인</text>
+</svg>

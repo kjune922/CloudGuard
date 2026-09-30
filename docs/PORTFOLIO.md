@@ -5,13 +5,16 @@ AWS 비용을 일별로 수집하고 월별 집계와 예산 상태를 제공하
 - 작성자: 이경준 · GitHub [kjune922](https://github.com/kjune922)
 - 역할: Java/Spring API, 비용·예산 도메인, JPA 저장 계층, 테스트 및 실행 환경 구현
 - 기술: Java 17, Spring Boot, Spring Data JPA, MySQL, Flyway, AWS SDK v2
-- 구현 근거: `7409ffc` · 문서 정리: 2026-09-30
+
+![비용 수집과 월 예산 조회](diagrams/architecture.svg)
 
 ## 프로젝트가 해결하는 문제
 
 클라우드 실습 비용을 월 예산과 함께 확인하도록 수집·집계·상태 판단을 연결했습니다. 주요 과제는 겹치는 기간의 비용 중복, 외부 응답의 도메인 변환, 환경별 DB 구조 관리였습니다.
 
 ## 1 재수집 시 비용 중복을 방지하는 저장 구조
+
+![재수집 기록 생성과 갱신](diagrams/reimport.svg)
 
 ### Situation
 
@@ -43,6 +46,8 @@ Cost Explorer를 DAILY로 조회하고 `AwsDailyServiceCost`에 발생 날짜를
 
 ## 2 외부 비용 데이터의 변환과 소수 정밀도 보존
 
+![외부 응답 변환과 정밀도 보존](diagrams/precision.svg)
+
 ### Situation
 
 AWS는 비용을 문자열로 반환하고 내부 enum과 다른 서비스명을 사용합니다. 여러 미분류 서비스가 OTHER에 대응할 수 있고, 비용에는 매우 작은 소수가 포함됩니다.
@@ -66,6 +71,8 @@ AWS는 비용을 문자열로 반환하고 내부 enum과 다른 서비스명을
 근거: [AWS 조회 서비스](../src/main/java/com/cloudguard/cloudguard/cost/aws/service/AwsCostExplorerService.java), [Mapper](../src/main/java/com/cloudguard/cloudguard/cost/aws/mapper/AwsServiceNameMapper.java), [페이지 테스트](../src/test/java/com/cloudguard/cloudguard/cost/aws/service/AwsCostExplorerServiceTest.java), [마이그레이션](../src/main/resources/db/migration/V1__init_schema.sql)
 
 ## 3 스키마 이력과 검증 환경의 분리
+
+![검증 환경과 배포 단계](diagrams/verification.svg)
 
 ### Situation
 
@@ -92,3 +99,6 @@ Docker Compose에는 MySQL 볼륨과 healthcheck를 구성했습니다. Actions�
 API 호출 성공뿐 아니라 저장 단위와 갱신 기준을 먼저 정해야 함을 배웠습니다. 외부 응답의 날짜·서비스·통화를 명시적으로 변환하고 실제 저장 계층까지 검증하면서 어떤 조건에서 데이터가 유지되는지 확인했습니다.
 
 메인 포트폴리오 완성 단계에서는 예산 반올림 경계값, 동시 수집 중복, 실제 MySQL 마이그레이션 검증을 우선 개선합니다. 재현 조건과 완료 기준은 [체크리스트](READINESS.md)에 정리했습니다.
+
+
+[데이터 모델과 설계 상세](ARCHITECTURE.md) · [서비스 확장 계획](ROADMAP.md)

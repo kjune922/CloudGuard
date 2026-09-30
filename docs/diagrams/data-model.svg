@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="670" viewBox="0 0 1280 670" role="img" aria-label="현재 데이터 모델">
+<title>현재 데이터 모델</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="36" y="64" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="29" font-weight="700" fill="#172B46">현재 데이터 모델</text>
+<text x="36" y="95" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#586B82">월 예산과 일별 비용은 별도 테이블이며 DB 외래 키 관계는 없습니다</text>
+<rect x="36" y="140" width="570" height="320" rx="14" fill="white" stroke="#CCD9E8"/>
+<rect x="36" y="140" width="570" height="62" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="58" y="180" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="25" font-weight="700" fill="#2463AA">cost_records</text>
+<text x="58" y="244" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">id</text>
+<text x="241" y="242" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">BIGINT · PK</text>
+<text x="58" y="286" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">service</text>
+<text x="241" y="284" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">EC2 / RDS / S3 / OTHER</text>
+<text x="58" y="328" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">usage_date</text>
+<text x="241" y="326" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">DATE · 비용 발생일</text>
+<text x="58" y="370" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">source</text>
+<text x="241" y="368" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">MANUAL / AWS_COST_EXPLORER</text>
+<text x="58" y="412" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">cost</text>
+<text x="241" y="410" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">DECIMAL(38,18) · 0 이상</text>
+<rect x="674" y="140" width="570" height="320" rx="14" fill="white" stroke="#CCD9E8"/>
+<rect x="674" y="140" width="570" height="62" rx="14" fill="#EDF4FC" stroke="#CCD9E8"/>
+<text x="696" y="180" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="25" font-weight="700" fill="#2463AA">monthly_budgets</text>
+<text x="696" y="244" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">id</text>
+<text x="879" y="242" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">BIGINT · PK</text>
+<text x="696" y="286" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">budget_month</text>
+<text x="879" y="284" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">VARCHAR(7) · 월별 UNIQUE</text>
+<text x="696" y="328" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="20" font-weight="700" fill="#172B46">monthly_limit</text>
+<text x="879" y="326" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="18" font-weight="400" fill="#172B46">DECIMAL(38,18) · 0 초과</text>
+<rect x="36" y="510" width="1208" height="105" rx="14" fill="#F5F9FD" stroke="#CCD9E8"/>
+<text x="58" y="549" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="22" font-weight="700" fill="#2463AA">BudgetService에서 월 기준으로 함께 조회</text>
+<text x="58" y="593" font-family="Noto Sans KR,Malgun Gothic,sans-serif" font-size="23" font-weight="400" fill="#172B46">월 비용 합계 + 해당 월 예산 → BudgetPolicy → 사용률과 예산 상태</text>
+</svg>

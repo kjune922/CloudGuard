@@ -1,52 +1,52 @@
 # CloudGuard
 
-**AWS 비용을 일별로 수집하고, 월별·서비스별 집계와 예산 상태를 제공하는 Java/Spring 백엔드입니다.**
+**AWS 비용을 일별로 수집하고 월별·서비스별 집계와 예산 상태를 제공하는 Java/Spring 백엔드입니다.**
 
-클라우드 실습 비용을 확인하고 관리하기 위해 만들었습니다. 재수집 시 비용을 계속 더하는 대신 기존 기록을 갱신하고, 수동 등록 비용과 AWS 수집 비용을 구분했습니다.
+클라우드 실습 비용을 월 예산과 함께 확인하려고 만들었습니다. 같은 기간을 다시 수집하면 기존 AWS 기록을 갱신하고, 수동으로 등록한 비용은 보존합니다.
 
-[STAR 포트폴리오](docs/PORTFOLIO.md) · [실행 및 API 가이드](docs/RUNBOOK.md) · [개선 체크리스트](docs/READINESS.md) · [개발 기록](docs/DEVELOPMENT_LOG.md)
+[포트폴리오](docs/PORTFOLIO.md) · [설계와 검증](docs/ARCHITECTURE.md) · [실행 및 API](docs/RUNBOOK.md) · [확장 계획](docs/ROADMAP.md) · [개발 기록](docs/DEVELOPMENT_LOG.md)
 
-## 주요 기능
+## 서비스 흐름
 
-- Cost Explorer 일별 수집: 페이지 토큰 처리, 서비스명 매핑, USD 검증
-- 순차 재수집 시 날짜·서비스·출처로 기존 기록을 찾아 금액 갱신
-- 월별 총액 및 EC2·RDS·S3·OTHER별 비용 조회
-- 월 예산 등록·변경 및 SAFE / CAUTION / WARNING / EXCEEDED 상태 조회
-- Bean Validation과 공통 예외 응답으로 잘못된 요청·예산 중복·미등록 처리
-- Flyway 스키마 관리와 Docker Compose 기반 MySQL 실행 환경
+![AWS 비용 수집과 월 예산 조회 흐름](docs/diagrams/architecture.svg)
 
-## 기술 스택
+| 기능 | 현재 구현 |
+| --- | --- |
+| AWS 비용 수집 | DAILY 조회, 모든 응답 페이지 처리, 서비스명 매핑, USD 검증 |
+| 비용 저장과 조회 | 수동 등록, AWS 기록 생성·갱신, 월별 총액과 EC2·RDS·S3·OTHER별 집계 |
+| 월 예산 관리 | 예산 등록·변경, 사용률과 SAFE / CAUTION / WARNING / EXCEEDED 상태 조회 |
+| 요청 검증 | Bean Validation, 잘못된 요청·예산 중복·미등록에 대한 공통 오류 응답 |
+
+## 재수집 처리
+
+![날짜 서비스 출처 기준의 생성과 갱신](docs/diagrams/reimport.svg)
+
+서비스·발생 날짜·출처로 기존 AWS 기록을 찾아 금액을 변경합니다. H2 통합 테스트에서 **AWS 10.5 → 12 갱신 시 기존 ID와 기록 1건 유지**, 수동 100 보존, 겹치는 날짜만 갱신되는 것을 확인했습니다. [코드와 테스트](docs/PORTFOLIO.md#1-재수집-시-비용-중복을-방지하는-저장-구조)
+
+소수 비용은 `BigDecimal`과 `DECIMAL(38,18)`을 사용합니다. `0.0000000488`을 저장한 뒤 `flush()`·`clear()`와 재조회로 동일 값을 확인했습니다. 모든 수치는 테스트 입력과 기댓값입니다.
+
+## 데이터 모델
+
+![월 예산과 일별 비용의 테이블 구조](docs/diagrams/data-model.svg)
+
+월 예산과 비용은 별도 테이블로 관리합니다. `BudgetService`가 해당 월 예산과 비용 합계를 조회해 상태를 계산합니다. [스키마와 제약](docs/ARCHITECTURE.md#데이터-모델)
+
+## 기술과 검증
 
 | 영역 | 기술 |
 | --- | --- |
 | 백엔드 | Java 17, Spring Boot 4.1.0, Spring MVC, Spring Data JPA |
 | 데이터 | MySQL 8.0, Flyway, H2 테스트 DB |
-| 외부 연동 | AWS SDK v2, Cost Explorer |
-| 검증 | JUnit 5, AssertJ, Mockito, MockMvc |
+| 연동과 테스트 | AWS SDK v2, JUnit 5, AssertJ, Mockito, MockMvc |
 | 실행 및 배포 구성 | Gradle, Docker Compose, GitHub Actions, ECR, EC2, SSM |
 
-## 핵심 설계와 검증
+기준 [Actions 실행](https://github.com/kjune922/CloudGuard/actions/runs/33743715476)의 테스트 단계는 통과했습니다. AWS 자격 증명 설정은 실패하여 ECR·SSM 단계는 실행되지 않았습니다. [검증 환경과 배포 도표](docs/ARCHITECTURE.md#검증-환경과-배포-구성)
 
-| 문제 | 설계 | 저장소 내 검증 근거 |
-| --- | --- | --- |
-| 재수집 시 합계가 증가할 수 있음 | 일별 수집과 날짜·서비스·출처 기준 갱신 | 두 번 수집해도 1건 유지, 기존 ID 보존, 겹친 날짜만 갱신 |
-| 작은 소수의 저장 정밀도 | BigDecimal과 DECIMAL(38,18) 사용 | `0.0000000488` 저장 후 flush/clear 및 재조회 |
-| 외부 서비스명이 내부 enum과 다름 | 원본 DTO와 Mapper 분리, 미분류는 OTHER 합산 | Mapper 및 날짜별 합산 단위 테스트 |
-| 환경마다 다른 DB 구조 | Flyway SQL과 배포 프로필의 `ddl-auto=validate` | V1 마이그레이션 파일 및 실행 구성 |
+현재 재수집 검증은 순차 실행 범위입니다. 예산 반올림 경계값, 동시 수집 중복, 실제 MySQL 마이그레이션 검증을 먼저 개선합니다. 상세 재현 조건은 [체크리스트](docs/READINESS.md)에 정리했습니다.
 
-검증 수치는 테스트 입력·기대값입니다. 성능 개선율이나 실제 사용자 규모를 의미하지 않습니다.
+## 실행
 
-## 요청 흐름
-
-`POST /api/aws/costs/import` → AWS 일별 비용 조회 → 날짜·서비스별 합산 → DB 저장·갱신
-
-`GET /api/budgets/status` → 월 비용 집계 → BudgetPolicy 사용률 계산·상태 판정 → JSON 응답
-
-AWS 종료일은 조회 범위에 포함되지 않습니다. `2026-08-01`부터 `2026-09-01`까지 요청하면 8월 전체를 수집합니다. 저장된 월별 집계에는 수동 비용과 AWS 비용이 함께 포함됩니다.
-
-## 빠른 실행
-
-Java 17 JDK와 Docker Compose가 필요합니다. 저장소 루트에 `.env`를 만들고 로컬 DB 값을 설정합니다.
+Java 17 JDK와 Docker Compose가 필요합니다. 저장소 루트의 `.env`에 아래 값을 설정합니다.
 
 ```dotenv
 CLOUDGUARD_DOCKER_DB_USERNAME=cloudguard
@@ -57,17 +57,7 @@ CLOUDGUARD_DOCKER_DB_ROOT_PASSWORD=choose_a_different_local_password
 ```bash
 docker compose up --build -d
 curl 'http://localhost:8080/api/costs/monthly/breakdown?yearMonth=2026-08'
-```
-
-이 실행 경로는 수동 비용 등록·조회에 사용할 수 있습니다. AWS 수집에는 실행 환경의 AWS 자격 증명이 별도로 필요합니다. Compose에는 자격 증명 전달 설정이 없습니다. 상세 절차는 [실행 가이드](docs/RUNBOOK.md)를 참고하세요.
-
-```bash
-# AWS 호출을 Mock으로 대체하는 일반 테스트
 bash gradlew test
 ```
 
-## 현재 검증 범위
-
-기준 커밋 `7409ffc`의 [Actions 실행](https://github.com/kjune922/CloudGuard/actions/runs/33743715476)에서 테스트 단계 통과를 확인했습니다. 같은 실행의 AWS 자격 증명 설정은 실패하여 ECR 업로드·SSM 배포는 실행되지 않았습니다.
-
-현재 중복 방지는 **순차 재수집** 범위입니다. 동시 수집 DB 제약, 예산 경계값 직전의 반올림 문제, MySQL 마이그레이션 자동 검증은 [우선 개선 항목](docs/READINESS.md)으로 관리합니다.
+수동 비용 등록·조회는 위 환경에서 실행할 수 있습니다. AWS 수집에는 별도 자격 증명이 필요하며 현재 Compose에는 전달 설정이 없습니다. [전체 실행 절차](docs/RUNBOOK.md)
