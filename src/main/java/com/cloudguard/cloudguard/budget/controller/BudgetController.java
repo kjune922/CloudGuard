@@ -6,21 +6,23 @@ import com.cloudguard.cloudguard.budget.dto.BudgetStatusResponse;
 import com.cloudguard.cloudguard.budget.dto.BudgetUpdateRequest;
 import com.cloudguard.cloudguard.budget.service.BudgetService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import java.time.YearMonth;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/budgets")
 public class BudgetController {
 
     private final BudgetService budgetService;
 
-    public BudgetController(BudgetService budgetService) {
-        this.budgetService = budgetService;
-    }
+//    public BudgetController(BudgetService budgetService) {
+//        this.budgetService = budgetService;
+//    }
 
-    // 기존 상태 -> 상세 상태반환으로 업데이트
+    // 월 비용과 예산을 비교한 상세 상태 조회 메서드
     @GetMapping("/status")
     public BudgetStatusResponse determineMonthlyStatus(
             @RequestParam("yearMonth")
@@ -32,6 +34,7 @@ public class BudgetController {
             );
     }
 
+    // 월 예산 등록 메서드
     @PostMapping("/add")
     public MonthlyBudget addMonthlyBudget(
             @Valid @RequestBody BudgetCreateRequest request
@@ -39,6 +42,7 @@ public class BudgetController {
         return budgetService.addMonthlyBudget(request.getYearMonth(),request.getMonthlyLimit());
     }
 
+    // 해당 월의 예산 변경 메서드
     @PutMapping("/{yearMonth}")
     public MonthlyBudget updateMonthlyBudget(
             @PathVariable("yearMonth")

@@ -7,6 +7,10 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 
+/**
+ * 1. DB에 저장하는 2개중 1개인 MonthlyBudget
+ * "특정 월의 예산 한건"
+ */
 
 @Entity
 @Table(name = "monthly_budgets")
@@ -22,7 +26,7 @@ public class MonthlyBudget {
     private YearMonth yearMonth;
 
     @Column(name = "monthly_limit", nullable = false, precision = 38, scale = 18)
-    private BigDecimal monthlyLimit;
+    private BigDecimal monthlyLimit; // 월 예산
 
     protected MonthlyBudget() {
     }

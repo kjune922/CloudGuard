@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
+/**
+ * GOAL : AWS 비용을 수집해 DB에 저장, 갱신
+ * HTTP 메서드 : POST
+ * 경로 : /api/aws/costs/import
+ * 호출하는 Service : AwsCostImportService
+ * 정상 응답 : 204, 응답본문 X
+ */
+
 @RestController
 @RequestMapping("/api/aws/costs")
 public class AwsCostImportController {

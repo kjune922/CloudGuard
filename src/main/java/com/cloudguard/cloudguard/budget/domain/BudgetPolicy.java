@@ -37,6 +37,14 @@ public class BudgetPolicy {
         return BudgetStatus.SAFE;
     }
 
+    public BigDecimal calculateUsageRate(BigDecimal currentCost) {
+        validateCurrentCost(currentCost);
+
+        return currentCost
+                .divide(monthlyLimit, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+    }
+
     private void validateMonthlyLimit(BigDecimal monthlyLimit) {
         if (monthlyLimit == null || monthlyLimit.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("월 예산은 0보다 커야 합니다 !!");
@@ -47,14 +55,6 @@ public class BudgetPolicy {
         if(currentCost == null || currentCost.compareTo(BigDecimal.ZERO) < 0){
             throw new IllegalArgumentException("현재 비용은 0 이상이어야 합니다 !!");
         }
-    }
-
-    public BigDecimal calculateUsageRate(BigDecimal currentCost) {
-        validateCurrentCost(currentCost);
-
-        return currentCost
-                .divide(monthlyLimit, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
     }
 
 }

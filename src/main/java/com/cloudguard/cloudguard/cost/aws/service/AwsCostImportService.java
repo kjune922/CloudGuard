@@ -41,6 +41,7 @@ public class AwsCostImportService {
         for (AwsDailyServiceCost dailyCost : dailyServiceCosts) {
 
             validateCurrency(dailyCost.getUnit());
+
             LocalDate usageDate = dailyCost.getUsageDate();
 
             CloudService cloudService = mapper.toCloudService(dailyCost.getServiceName());

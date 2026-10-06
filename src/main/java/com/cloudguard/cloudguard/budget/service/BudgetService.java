@@ -9,6 +9,7 @@ import com.cloudguard.cloudguard.budget.exception.MonthlyBudgetNotFoundException
 import com.cloudguard.cloudguard.budget.repository.MonthlyBudgetRepository;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +17,17 @@ import java.math.BigDecimal;
 import java.time.YearMonth;
 
 @Service
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final CostService costService;
     private final MonthlyBudgetRepository monthlyBudgetRepository;
 
-    @Autowired
-    public BudgetService(CostService costService, MonthlyBudgetRepository monthlyBudgetRepository) {
-        this.costService = costService;
-        this.monthlyBudgetRepository = monthlyBudgetRepository;
-    }
+//    @Autowired
+//    public BudgetService(CostService costService, MonthlyBudgetRepository monthlyBudgetRepository) {
+//        this.costService = costService;
+//        this.monthlyBudgetRepository = monthlyBudgetRepository;
+//    }
 
     public MonthlyBudget addMonthlyBudget(YearMonth yearMonth,BigDecimal monthlyLimit){
         if(monthlyBudgetRepository.existsByYearMonth(yearMonth)){

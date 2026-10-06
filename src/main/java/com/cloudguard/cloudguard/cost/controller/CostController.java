@@ -8,6 +8,7 @@ import com.cloudguard.cloudguard.cost.dto.MonthlyCostResponse;
 import com.cloudguard.cloudguard.cost.dto.MonthlyServiceCostResponse;
 import com.cloudguard.cloudguard.cost.service.CostService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +18,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/costs")
+@RequiredArgsConstructor
 public class CostController {
 
     private final CostService costService;
 
-    public CostController(CostService costService) {
-        this.costService = costService;
-    }
+//    public CostController(CostService costService) {
+//        this.costService = costService;
+//    }
 
     @PostMapping("/add-cost")
     public CostRecord addServiceCost(@Valid @RequestBody CostCreateRequest request){

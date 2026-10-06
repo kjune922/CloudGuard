@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * 1. DB에 저장하는 2개중 1개인 CostRecord
+ * CostRecord는 비용 기록 1건
+ */
+
 @Entity
 @Table(name = "cost_records")
 public class CostRecord {

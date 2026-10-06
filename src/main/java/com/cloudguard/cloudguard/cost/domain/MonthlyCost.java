@@ -6,6 +6,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DB에 저장되는 엔티티는 아님
+ * 비용 기록 목록을 받아 합계를 계산하는 일반 JAVA 객체
+ */
 public class MonthlyCost {
 
     private final List<CostRecord> costRecords;

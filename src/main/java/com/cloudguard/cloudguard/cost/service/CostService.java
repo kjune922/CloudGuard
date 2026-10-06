@@ -5,6 +5,7 @@ import com.cloudguard.cloudguard.cost.domain.CostRecord;
 import com.cloudguard.cloudguard.cost.domain.CostSource;
 import com.cloudguard.cloudguard.cost.domain.MonthlyCost;
 import com.cloudguard.cloudguard.cost.repository.CostRecordRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,22 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CostService {
 
     private final CostRecordRepository costRecordRepository;
 
-    @Autowired
-    public CostService(CostRecordRepository costRecordRepository) {
-        this.costRecordRepository = costRecordRepository;
+//    @Autowired
+//    public CostService(CostRecordRepository costRecordRepository) {
+//        this.costRecordRepository = costRecordRepository;
+//    }
+
+    public CostRecord addServiceCost(CloudService cloudService, BigDecimal cost, LocalDate usageDate){
+        // 출저는 MANUAL로 생성하고, 생성자에서 값을 검증함
+        CostRecord costRecord = new CostRecord(cloudService,cost,usageDate);
+
+        // 새 엔티티의 저장을 요청하고, 엔티티를 반환한다. 그리고 내부적으로 em.persist()를 진행
+        return costRecordRepository.save(costRecord);
     }
 
     public BigDecimal calculateMonthlyCost(YearMonth yearMonth){
@@ -63,11 +73,6 @@ public class CostService {
         );
         MonthlyCost monthlyCost = new MonthlyCost(records);
         return monthlyCost.calculateTotal(yearMonth);
-    }
-
-    public CostRecord addServiceCost(CloudService cloudService, BigDecimal cost, LocalDate usageDate){
-        CostRecord costRecord = new CostRecord(cloudService,cost,usageDate);
-        return costRecordRepository.save(costRecord);
     }
 
     // 월별 전체 서비스 비용 조회 메소드
