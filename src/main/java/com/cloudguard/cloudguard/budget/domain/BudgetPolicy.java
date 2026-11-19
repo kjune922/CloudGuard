@@ -20,17 +20,16 @@ public class BudgetPolicy {
     public BudgetStatus determineStatus(BigDecimal currentCost){
         validateCurrentCost(currentCost);
 
-        BigDecimal usageRate = calculateUsageRate(currentCost);
-
-        if(usageRate.compareTo(BigDecimal.valueOf(100)) >= 0){
+        // 화면에 표시할 사용률의 반올림이 실제 예산 상태를 바꾸지 않게 한다.
+        if(currentCost.compareTo(monthlyLimit) >= 0){
             return BudgetStatus.EXCEEDED;
         }
 
-        if(usageRate.compareTo(BigDecimal.valueOf(85)) >= 0){
+        if(currentCost.compareTo(monthlyLimit.multiply(new BigDecimal("0.85"))) >= 0){
             return BudgetStatus.WARNING;
         }
 
-        if(usageRate.compareTo(BigDecimal.valueOf(70)) >= 0){
+        if(currentCost.compareTo(monthlyLimit.multiply(new BigDecimal("0.70"))) >= 0){
             return BudgetStatus.CAUTION;
         }
 

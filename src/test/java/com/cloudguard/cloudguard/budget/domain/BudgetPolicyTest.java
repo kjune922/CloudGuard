@@ -2,6 +2,8 @@ package com.cloudguard.cloudguard.budget.domain;
 
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
 
@@ -9,6 +11,30 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class BudgetPolicyTest {
+
+    @ParameterizedTest
+    @CsvSource({
+            "100, 69.999, SAFE", "100, 70, CAUTION", "100, 70.001, CAUTION",
+            "100, 84.999, CAUTION", "100, 85, WARNING", "100, 85.001, WARNING",
+            "100, 99.999, WARNING", "100, 100, EXCEEDED", "100, 100.001, EXCEEDED",
+            "3, 2.099999999999999999, SAFE", "3, 2.1, CAUTION",
+            "3, 2.549999999999999999, CAUTION", "3, 2.55, WARNING",
+            "0.01, 0.0069999, SAFE", "0.01, 0.007, CAUTION",
+            "10000000000000000000, 6999999999999999999.999, SAFE"
+    })
+    void 반올림하지_않은_실제_금액으로_경계를_판정한다(
+            String limit, String cost, BudgetStatus expected) {
+        BudgetPolicy policy = new BudgetPolicy(new BigDecimal(limit));
+        assertThat(policy.determineStatus(new BigDecimal(cost))).isEqualTo(expected);
+    }
+
+    @Test
+    void 표시용_사용률이_반올림되어도_실제_상태는_경계_미만이다() {
+        BudgetPolicy policy = new BudgetPolicy(new BigDecimal("100"));
+        BigDecimal cost = new BigDecimal("69.999");
+        assertThat(policy.calculateUsageRate(cost)).isEqualByComparingTo("70");
+        assertThat(policy.determineStatus(cost)).isEqualTo(BudgetStatus.SAFE);
+    }
 
     @Test
     void 사용률이_70퍼센트_미만이면_SAFE다() {
