@@ -1,4 +1,5 @@
 FROM eclipse-temurin:17-jdk-jammy AS builder
+ENV JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"
 
 WORKDIR /workspace
 
@@ -13,6 +14,7 @@ RUN ./gradlew bootJar --no-daemon
 
 
 FROM eclipse-temurin:17-jre-jammy
+ENV JAVA_TOOL_OPTIONS="-XX:-UseBASE64Intrinsics"
 
 WORKDIR /app
 
